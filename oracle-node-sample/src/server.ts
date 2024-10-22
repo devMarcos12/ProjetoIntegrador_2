@@ -16,7 +16,7 @@ routes.get('/getClientes', async (req: Request, res: Response) => {
         connection = await oracledb.getConnection({
             user: "admin",
             password: "OracleCloud!23",
-            connectString: "(description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.sa-saopaulo-1.oraclecloud.com))(connect_data=(service_name=g920f13bf6b396e_integrador_high.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))"
+            connectString: "(description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.sa-saopaulo-1.oraclecloud.com))(connect_data=(service_name=g920f13bf6b396e_txjczt529xfpir2e_high.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))"
         });
 
         await connection.execute(`BEGIN
