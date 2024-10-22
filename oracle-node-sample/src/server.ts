@@ -19,10 +19,6 @@ routes.get('/getClientes', async (req: Request, res: Response) => {
             connectString: "(description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.sa-saopaulo-1.oraclecloud.com))(connect_data=(service_name=g920f13bf6b396e_txjczt529xfpir2e_high.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))"
         });
 
-        await connection.execute(`BEGIN
-            EXECUTE IMMEDIATE 'CREATE TABLE nodetab (id NUMBER, nome VARCHAR2(50))';
-        END;`);
-
         const result = await connection.execute(`SELECT * FROM nodetab`);
 
         res.status(200).json(result.rows);
