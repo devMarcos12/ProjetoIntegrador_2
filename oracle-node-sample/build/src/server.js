@@ -27,7 +27,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importStar(require("express"));
-const oracledb_1 = __importDefault(require("oracledb"));
+const connection_1 = __importDefault(require("./connection")); // Importando a classe DataBase
 const app = (0, express_1.default)();
 const port = 3000;
 const routes = (0, express_1.Router)();
@@ -37,34 +37,23 @@ routes.get('/', (req, res) => {
 routes.get('/getClientes', async (req, res) => {
     let connection;
     try {
-        connection = await oracledb_1.default.getConnection({
-            user: "admin",
-            password: "OracleCloud!23",
-            connectString: "(description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.sa-saopaulo-1.oraclecloud.com))(connect_data=(service_name=g920f13bf6b396e_txjczt529xfpir2e_high.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))"
-        });
-        await connection.execute(`BEGIN
-            EXECUTE IMMEDIATE 'CREATE TABLE nodetab (id NUMBER, nome VARCHAR2(50))';
-        END;`);
+        // Get the connection from database class
+        connection = await connection_1.default.connect();
         const result = await connection.execute(`SELECT * FROM nodetab`);
         res.status(200).json(result.rows);
-        console.dir(result.rows, { depth: null });
+        console.log(result.rows);
     }
     catch (err) {
-        console.error(err);
-        res.status(500).send("Erro ao conectar ao banco de dados.");
+        console.error('Erro ao processar a consulta:', err);
+        res.status(500).send('Erro ao conectar ao banco de dados.');
     }
     finally {
         if (connection) {
-            try {
-                await connection.close();
-            }
-            catch (err) {
-                console.error('Erro ao fechar a conexão:', err);
-            }
+            await connection_1.default.close(connection);
         }
     }
 });
 app.use(routes);
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+    console.log(`Servidor rodando na porta ${port}`);
 });

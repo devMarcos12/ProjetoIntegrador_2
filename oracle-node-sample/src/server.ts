@@ -1,45 +1,38 @@
 import express, { Request, Response, Router } from 'express';
-import oracledb from 'oracledb';
+import DataBase from './connection';  // Importando a classe DataBase
 
 const app = express();
 const port = 3000;
-const routes = Router();
+const routes = Router()
 
 routes.get('/', (req: Request, res: Response) => {
     res.status(200).send("Funcionando...");
 });
 
-routes.get('/getClientes', async (req: Request, res: Response) => {
-    let connection;
+routes.get('/test', async (req: Request, res: Response) => {
+  let connection;
 
-    try {
-        connection = await oracledb.getConnection({
-            user: "admin",
-            password: "OracleCloud!23",
-            connectString: "(description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.sa-saopaulo-1.oraclecloud.com))(connect_data=(service_name=g920f13bf6b396e_txjczt529xfpir2e_high.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))"
-        });
+  try {
+    // Get the connection from database class
+    connection = await DataBase.connect();
 
-        const result = await connection.execute(`SELECT * FROM nodetab`);
+    const result = await connection.execute(`SELECT * FROM nodetab`);
 
-        res.status(200).json(result.rows);
-        console.dir(result.rows, { depth: null });
+    res.status(200).json(result.rows);
+    console.log(result.rows);
 
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Erro ao conectar ao banco de dados.");
-    } finally {
-        if (connection) {
-            try {
-                await connection.close();
-            } catch (err) {
-                console.error('Erro ao fechar a conexão:', err);
-            }
-        }
+  } catch (err) {
+    console.error('Erro ao processar a consulta:', err);
+    res.status(500).send('Erro ao conectar ao banco de dados.');
+  } finally {
+    if (connection) {
+      await DataBase.close(connection);
     }
+  }
 });
 
 app.use(routes);
 
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+  console.log(`Servidor rodando na porta ${port}`);
 });
