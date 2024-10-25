@@ -11,7 +11,7 @@ class DataBase {
     #configs;
     constructor() {
         this.#configs = {
-            user: process.env.USER,
+            user: process.env.DB_USER,
             password: process.env.PASSWORD,
             connectString: process.env.CONNECTSTRING,
         };

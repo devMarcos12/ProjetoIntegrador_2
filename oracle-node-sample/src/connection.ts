@@ -13,7 +13,6 @@ class DataBase {
       password: process.env.PASSWORD,
       connectString: process.env.CONNECTSTRING,
     };
-    console.log('Configs carregados:', this.#configs);
   }
   
 

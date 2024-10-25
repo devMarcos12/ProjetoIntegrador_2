@@ -27,14 +27,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importStar(require("express"));
-const connection_1 = __importDefault(require("./connection")); // Importando a classe DataBase
+const connection_1 = __importDefault(require("./connection"));
 const app = (0, express_1.default)();
 const port = 3000;
 const routes = (0, express_1.Router)();
 routes.get('/', (req, res) => {
     res.status(200).send("Funcionando...");
 });
-routes.get('/getClientes', async (req, res) => {
+routes.post('/cadastro', async (req, res) => {
+});
+routes.get('/test', async (req, res) => {
     let connection;
     try {
         // Get the connection from database class

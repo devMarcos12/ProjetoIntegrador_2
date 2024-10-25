@@ -1,5 +1,5 @@
 import express, { Request, Response, Router } from 'express';
-import DataBase from './connection';  // Importando a classe DataBase
+import DataBase from './connection';
 
 const app = express();
 const port = 3000;
