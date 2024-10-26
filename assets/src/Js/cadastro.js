@@ -8,7 +8,7 @@ function CPFmodel(cpf) {
 
 function PhoneModel(telefone) {
     telefone = telefone.replace(/\D/g, ''); // Just accepts number caracters
-    telefone = telefone.replace(/(\d{2})(\d)/, '($1) $2'); // Adiciona () to DDD
+    telefone = telefone.replace(/(\d{2})(\d)/, '($1) $2'); // Add () to DDD
     telefone = telefone.replace(/(\d{4,5})(\d{4})$/, '$1-$2'); // Add "-" between the group numbers
     return telefone;
 }
