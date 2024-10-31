@@ -9,8 +9,8 @@ O projeto ainda está em desenvolvimento e as próximas atualizações serão vo
 
 - [x] Registrar aluno
 - [ ] Catraca do aluno
-- [ ] 
-- [ ] 
+- [ ] Lorem
+- [ ] Lorem
 - [ ] Tela do gerente
 
 ## 💻 Pré-requisitos
