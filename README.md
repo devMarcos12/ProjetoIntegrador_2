@@ -47,11 +47,15 @@ npm install
 
 Para usar Academiax, siga estas etapas:
 
+Acesse o diretório (oracle-node-sample):
+```
+cd oracle-node-sample
+```
+Depois acesse os endpoints:
+
 ```
 npm run dev
 ```
-Para rodar os endpoints e conseguir ter a experiencia com a integração
 
-Adicione comandos de execução e exemplos que você acha que os usuários acharão úteis. Forneça uma referência de opções para pontos de bônus!
 
 ## 🤝 Colaboradores
