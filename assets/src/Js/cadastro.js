@@ -13,11 +13,10 @@ function PhoneModel(telefone) {
     return telefone;
 }
 
-// Apply the functions to the specified fields
+// Apply the functions to the specified fields (cpf, phone)
 document.getElementById('cpf').addEventListener('input', (event) => {
     event.target.value = CPFmodel(event.target.value);
 });
-
 document.getElementById('telefone').addEventListener('input', (event) => {
     event.target.value = PhoneModel(event.target.value);
 });

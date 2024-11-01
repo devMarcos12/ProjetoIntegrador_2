@@ -20,7 +20,7 @@ routes.get('/test', async (req: Request, res: Response) => {
     // Get the connection from database class
     connection = await DataBase.connect();
 
-    const result = await connection.execute(`SELECT * FROM nodetab`);
+    const result = await connection.execute(`SELECT name FROM alunos`);
 
     res.status(200).json(result.rows);
     console.log(result.rows);
@@ -41,7 +41,7 @@ routes.post('/register', async (req: Request, res: Response) => {
   const { name, email, telefone, cpf, data_nasc, endereco, peso, altura } = req.body;
   let connection;
 
-  console.log('Dados recebidos:', req.body);
+  console.log('Dados recebidos(Json):', req.body);
 
   try {
     connection = await DataBase.connect();
@@ -58,7 +58,7 @@ routes.post('/register', async (req: Request, res: Response) => {
     res.status(201).json({ message: 'Cadastro realizado com sucesso!' });
   } catch (err) {
     console.error('Erro ao cadastrar o usuário:', err);
-    res.status(500).json({ message: 'Erro ao cadastrar o usuário.' }); // Resposta em JSON
+    res.status(500).json({ message: 'Erro ao cadastrar o usuário.' });
   } finally {
     if (connection) {
       await DataBase.close(connection);
@@ -66,7 +66,6 @@ routes.post('/register', async (req: Request, res: Response) => {
     }
   }
 });
-
 
 app.use(routes);
 
