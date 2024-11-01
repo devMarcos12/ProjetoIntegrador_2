@@ -27,21 +27,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importStar(require("express"));
+const cors_1 = __importDefault(require("cors"));
 const connection_1 = __importDefault(require("./connection"));
 const app = (0, express_1.default)();
 const port = 3000;
 const routes = (0, express_1.Router)();
+app.use(express_1.default.json());
+app.use((0, cors_1.default)());
 routes.get('/', (req, res) => {
     res.status(200).send("Funcionando...");
-});
-routes.post('/cadastro', async (req, res) => {
 });
 routes.get('/test', async (req, res) => {
     let connection;
     try {
         // Get the connection from database class
         connection = await connection_1.default.connect();
-        const result = await connection.execute(`SELECT * FROM nodetab`);
+        const result = await connection.execute(`SELECT name FROM alunos`);
         res.status(200).json(result.rows);
         console.log(result.rows);
     }
@@ -52,6 +53,33 @@ routes.get('/test', async (req, res) => {
     finally {
         if (connection) {
             await connection_1.default.close(connection);
+        }
+    }
+});
+routes.post('/register', async (req, res) => {
+    console.log('Recebendo requisição no endpoint /register');
+    const { name, email, telefone, cpf, data_nasc, endereco, peso, altura } = req.body;
+    let connection;
+    console.log('Dados recebidos(Json):', req.body);
+    try {
+        connection = await connection_1.default.connect();
+        console.log('Conexão com o banco de dados estabelecida');
+        const insertQuery = `
+      INSERT INTO alunos (name, email, telefone, cpf, data_nasc, endereco, peso, altura)
+      VALUES (:name, :email, :telefone, :cpf, TO_DATE(:data_nasc, 'YYYY-MM-DD'), :endereco, :peso, :altura)
+    `;
+        await connection.execute(insertQuery, [name, email, telefone, cpf, data_nasc, endereco, peso, altura]);
+        await connection.commit();
+        res.status(201).json({ message: 'Cadastro realizado com sucesso!' });
+    }
+    catch (err) {
+        console.error('Erro ao cadastrar o usuário:', err);
+        res.status(500).json({ message: 'Erro ao cadastrar o usuário.' });
+    }
+    finally {
+        if (connection) {
+            await connection_1.default.close(connection);
+            console.log('Conexão com o banco de dados fechada');
         }
     }
 });

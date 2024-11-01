@@ -1,23 +1,22 @@
 function CPFmodel(cpf) {
-    cpf = cpf.replace(/\D/g, ''); // Just accepts number caracters
-    cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2'); // Add a point after 3 firts numbers
-    cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2'); // Add a point after 6 firts numbers
-    cpf = cpf.replace(/(\d{3})(\d{1,2})$/, '$1-$2'); // Add "-" before lats two digits
+    cpf = cpf.replace(/\D/g, ''); // Just accepts number characters
+    cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2'); // Add a point after 3 first numbers
+    cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2'); // Add a point after 6 first numbers
+    cpf = cpf.replace(/(\d{3})(\d{1,2})$/, '$1-$2'); // Add "-" before last two digits
     return cpf;
 }
 
 function PhoneModel(telefone) {
-    telefone = telefone.replace(/\D/g, ''); // Just accepts number caracters
+    telefone = telefone.replace(/\D/g, ''); // Just accepts number characters
     telefone = telefone.replace(/(\d{2})(\d)/, '($1) $2'); // Add () to DDD
     telefone = telefone.replace(/(\d{4,5})(\d{4})$/, '$1-$2'); // Add "-" between the group numbers
     return telefone;
 }
 
-// Applies the functions to the specified fields
+// Apply the functions to the specified fields (cpf, phone)
 document.getElementById('cpf').addEventListener('input', (event) => {
     event.target.value = CPFmodel(event.target.value);
 });
-
 document.getElementById('telefone').addEventListener('input', (event) => {
     event.target.value = PhoneModel(event.target.value);
 });
@@ -25,7 +24,7 @@ document.getElementById('telefone').addEventListener('input', (event) => {
 document.getElementById('registerForm').addEventListener('submit', async (event) => {
     event.preventDefault();
 
-    // Get the datas from forms
+    // Get the data from the form
     const formData = {
         name: document.getElementById('name').value,
         email: document.getElementById('email').value,
@@ -37,9 +36,27 @@ document.getElementById('registerForm').addEventListener('submit', async (event)
         altura: document.getElementById('altura').value,
     };
 
-    const formDataJson = JSON.stringify(formData);
+    try {
+        const response = await fetch('http://localhost:3000/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
 
-    console.log('Json gerado', formDataJson)
+        const data = await response.json();
 
-    // TODO: criar a endpoint /register 
+        if (response.ok) {
+            alert(data.message);
+            window.location.href = './index_login.html';
+        } else if (response.status === 409) {
+            alert('Erro ao cadastrar usuário, este CPF já está em uso');
+        } else {
+            alert('Erro ao cadastrar usuário');
+        }
+    } catch (error) {
+        console.error('Erro ao enviar os dados:', error);
+        alert('Erro ao conectar com o servidor');
+    }
 });
