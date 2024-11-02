@@ -24,7 +24,6 @@ document.getElementById('telefone').addEventListener('input', (event) => {
 document.getElementById('registerForm').addEventListener('submit', async (event) => {
     event.preventDefault();
 
-    // Get the data from the form
     const formData = {
         name: document.getElementById('name').value,
         email: document.getElementById('email').value,
@@ -45,18 +44,17 @@ document.getElementById('registerForm').addEventListener('submit', async (event)
             body: JSON.stringify(formData)
         });
 
-        const data = await response.json();
-
         if (response.ok) {
-            alert(data.message);
+            alert('Cadastro realizado com sucesso!');
             window.location.href = './index_login.html';
         } else if (response.status === 409) {
-            alert('Erro ao cadastrar usuário, este CPF já está em uso');
+            alert('Este CPF já está em uso.');
         } else {
-            alert('Erro ao cadastrar usuário');
+            alert('Erro ao realizar o cadastro. Tente novamente.');
         }
     } catch (error) {
         console.error('Erro ao enviar os dados:', error);
-        alert('Erro ao conectar com o servidor');
+        alert('Erro ao enviar os dados. Tente novamente.');
     }
 });
+

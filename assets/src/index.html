@@ -9,12 +9,11 @@
 </head>
 <body>
     <div class="container">
-        
-            <div class="form-image">
-                <h1 class="form-img-title">AcademiaX</h1>
-                <img src="../img/undraw_personal_trainer_re_cnua.svg">
-            </div>
-        
+        <div class="form-image">
+            <h1 class="form-img-title">AcademiaX</h1>
+            <img src="../img/undraw_personal_trainer_re_cnua.svg">
+        </div>
+
         <div class="form">
             <form id="registerForm" action="#">
                 <div class="form-header">
@@ -22,11 +21,11 @@
                         <h1>Cadastre-se</h1>
                     </div> 
                     <div class="login-button">
-                        <button><a href ="./index_login.html">Login</a></button>
+                        <button type="button" onclick="window.location.href='./index_login.html'">Login</button>
                     </div>
                 </div>
 
-                <div class ="input-group">
+                <div class="input-group">
                     <div class="input-box">
                         <label for="name">Nome*</label>
                         <input id="name" type="text" name="name" placeholder="Digite seu nome" maxlength="50" required>
@@ -39,17 +38,17 @@
 
                     <div class="input-box">
                         <label for="telefone">Telefone*</label>
-                        <input id="telefone" type="tel" name="telefone" placeholder="(xx) xxxx-xxxx " maxlength="15" required>
+                        <input id="telefone" type="tel" name="telefone" placeholder="(xx) xxxx-xxxx" maxlength="15" required>
                     </div>
 
                     <div class="input-box">
                         <label for="CPF">CPF*</label>
                         <input id="cpf" type="text" name="cpf" placeholder="Digite seu CPF" maxlength="14" required>
                     </div>
-                
+
                     <div class="input-box">
                         <label for="data-nasc">Data de nascimento*</label>
-                        <input id="data-nasc" type="date" name="data-nasc"  required>
+                        <input id="data-nasc" type="date" name="data-nasc" required>
                     </div>
 
                     <div class="input-box">
@@ -59,20 +58,18 @@
 
                     <div class="input-box">
                         <label for="peso">Peso</label>
-                        <input id="peso" type="number" name="peso" placeholder="Digite seu peso" >
+                        <input id="peso" type="number" name="peso" placeholder="Digite seu peso">
                     </div>
 
                     <div class="input-box">
                         <label for="altura">Altura</label>
                         <input id="altura" type="number" name="altura" placeholder="Digite sua altura">
                     </div>
-
                 </div>
 
                 <div class="continue-button">
-                    <button type="submit"><a href="./index_login.html">Continuar</a></button>
+                    <button type="submit">Continuar</button>
                 </div>
-
             </form>
         </div>
     </div>
