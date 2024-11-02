@@ -67,6 +67,42 @@ routes.post('/register', async (req: Request, res: Response) => {
   }
 });
 
+routes.post('/login', async (req: Request, res: Response) => {
+  console.log('Recebendo requisição no endpoint /login');
+
+  const { name } = req.body;
+  let connection;
+
+  console.log('Dados recebidos (JSON):', req.body);
+
+  try {
+    connection = await DataBase.connect();
+    console.log('Conexão com o banco de dados estabelecida');
+
+    const query = `SELECT name FROM alunos WHERE LOWER(name) = :name`;
+    const result = await connection.execute(query, [name.toLowerCase()]);
+
+    const rows = result.rows as any[][]; // Faz o casting para any[][]
+
+    if (rows && rows.length > 0) {
+      console.log('Usuário encontrado:', rows[0][0]);
+      res.status(200).json({ message: 'Login bem-sucedido', user: rows[0][0] });
+    } else {
+      console.log('Usuário não encontrado');
+      res.status(404).json({ message: 'Usuário não encontrado' });
+    }
+  } catch (err) {
+    console.error('Erro ao verificar o login:', err);
+    res.status(500).send('Erro ao processar o login.');
+  } finally {
+    if (connection) {
+      await DataBase.close(connection);
+      console.log('Conexão com o banco de dados fechada');
+    }
+  }
+});
+
+
 app.use(routes);
 
 app.listen(port, () => {
