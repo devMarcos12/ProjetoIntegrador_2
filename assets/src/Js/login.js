@@ -13,7 +13,7 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
         });
 
         if (response.ok) {
-            window.location.href = './cadastro.html';
+            window.location.href = './catraca.html';
         } else if (response.status === 404) {
             alert('Usuário não encontrado. Verifique o nome e tente novamente.');
         } else {
