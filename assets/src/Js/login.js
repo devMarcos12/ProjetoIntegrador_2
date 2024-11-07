@@ -12,7 +12,11 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
             body: JSON.stringify({ name })
         });
 
+
+        console.log('Response status:', response.status);
         if (response.ok) {
+            const responseData = await response.json();
+            localStorage.setItem('nomeAluno', responseData.user);
             window.location.href = './user_info.html';
         } else if (response.status === 404) {
             alert('Usuário não encontrado. Verifique o nome e tente novamente.');
