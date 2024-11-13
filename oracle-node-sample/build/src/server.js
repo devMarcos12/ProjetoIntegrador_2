@@ -114,6 +114,70 @@ routes.post('/login', async (req, res) => {
         }
     }
 });
+routes.post('/getStudentInfo', async (req, res) => {
+    console.log('Recebendo requisição no endpoint /getStudentInfo');
+    const { name } = req.body; // Pode ser 'cpf' se preferir usar o CPF como identificador
+    let connection;
+    console.log('Dados recebidos (JSON):', req.body);
+    try {
+        connection = await connection_1.default.connect();
+        console.log('Conexão com o banco de dados estabelecida');
+        // Consulta para obter horas treinadas e classificação do aluno
+        const query = `
+      SELECT 
+          a.id AS aluno_id,
+          a.name AS aluno_nome,
+          NVL(SUM(r.duracao), 0) AS horas_treinadas,
+          CASE
+              WHEN NVL(SUM(r.duracao), 0) <= 5 THEN 'Iniciante'
+              WHEN NVL(SUM(r.duracao), 0) BETWEEN 6 AND 10 THEN 'Intermediário'
+              WHEN NVL(SUM(r.duracao), 0) BETWEEN 11 AND 20 THEN 'Avançado'
+              WHEN NVL(SUM(r.duracao), 0) > 20 THEN 'Extremamente Avançado'
+              ELSE 'Sem classificação'
+          END AS classificacao
+      FROM 
+          alunos a
+      LEFT JOIN 
+          registro_treino r ON a.cpf = r.fk_aluno_cpf
+          AND r.horario_entrada >= TRUNC(SYSDATE) - 7
+      WHERE 
+          LOWER(a.name) = :name
+      GROUP BY 
+          a.id, a.name
+    `;
+        const result = await connection.execute(query, [name.toLowerCase()]);
+        const rows = result.rows;
+        if (rows && rows.length > 0) {
+            const [aluno_id, aluno_nome, horas_treinadas, classificacao] = rows[0];
+            console.log('Dados do aluno encontrados:', {
+                aluno_id,
+                aluno_nome,
+                horas_treinadas,
+                classificacao
+            });
+            res.status(200).json({
+                aluno_id,
+                aluno_nome,
+                horas_treinadas,
+                classificacao
+            });
+        }
+        else {
+            console.log('Aluno não encontrado');
+            res.status(404).json({ message: 'Aluno não encontrado' });
+        }
+    }
+    catch (err) {
+        console.error('Erro ao buscar informações do aluno:', err);
+        res.status(500).send('Erro ao processar a solicitação.');
+    }
+    finally {
+        if (connection) {
+            await connection_1.default.close(connection);
+            console.log('Conexão com o banco de dados fechada');
+        }
+    }
+});
 app.use(routes);
 app.listen(port, () => {
     console.log(`Servidor rodando na porta ${port}`);

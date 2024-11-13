@@ -12,12 +12,29 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
             body: JSON.stringify({ name })
         });
 
-
-        console.log('Response status:', response.status);
         if (response.ok) {
-            const responseData = await response.json();
-            localStorage.setItem('nomeAluno', responseData.user);
-            window.location.href = './user_info.html';
+            const loginData = await response.json();
+            const alunoNome = loginData.user;
+
+            const infoResponse = await fetch('http://localhost:3000/getStudentInfo', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name })
+            });
+
+            if (infoResponse.ok) {
+                const studentInfo = await infoResponse.json();
+                localStorage.setItem('nomeAluno', studentInfo.aluno_nome);
+                localStorage.setItem('horasTreinadas', studentInfo.horas_treinadas);
+                localStorage.setItem('classificacao', studentInfo.classificacao);
+                window.location.href = './user_info.html';
+            } else if (infoResponse.status === 404) {
+                alert('Informações do aluno não encontradas.');
+            } else {
+                alert('Erro ao obter informações do aluno. Tente novamente.');
+            }
         } else if (response.status === 404) {
             alert('Usuário não encontrado. Verifique o nome e tente novamente.');
         } else {
