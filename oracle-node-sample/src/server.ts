@@ -105,7 +105,7 @@ routes.post('/login', async (req: Request, res: Response) => {
 routes.post('/getStudentInfo', async (req: Request, res: Response) => {
   console.log('Recebendo requisição no endpoint /getStudentInfo');
 
-  const { name } = req.body; // Pode ser 'cpf' se preferir usar o CPF como identificador
+  const { name } = req.body;
   let connection;
 
   console.log('Dados recebidos (JSON):', req.body);
