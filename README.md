@@ -2,17 +2,6 @@
 
 <img src="imagem.png" alt="Exemplo imagem">
 
-
-### Ajustes e melhorias
-
-O projeto ainda está em desenvolvimento e as próximas atualizações serão voltadas para as seguintes tarefas:
-
-- [x] Registrar aluno
-- [ ] Catraca do aluno
-- [ ] Lorem
-- [ ] Lorem
-- [ ] Tela do gerente
-
 ## 💻 Pré-requisitos
 
 Antes de começar, verifique se você atendeu aos seguintes requisitos:
