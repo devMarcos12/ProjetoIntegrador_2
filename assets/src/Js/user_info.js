@@ -20,47 +20,62 @@ if (nomeAluno) {
     window.location.href = './index_login.html';
 }
 
-// Função para obter o dia da semana de uma data no formato YYYY-MM-DD ou DD/MM/YYYY
+// Função para obter o dia da semana de uma data no formato YYYY-MM-DD
 function obterDiaSemana(dataStr) {
-    let data;
-    if (dataStr.includes("-")) { // Verifica se a data está no formato YYYY-MM-DD
-        const [ano, mes, dia] = dataStr.split("-").map(Number);
-        data = new Date(ano, mes - 1, dia);
-    } else { // Presume que está no formato DD/MM/YYYY
-        const [dia, mes, ano] = dataStr.split("/").map(Number);
-        data = new Date(ano, mes - 1, dia);
-    }
-    console.log("Convertendo data:", dataStr);
+    const [ano, mes, dia] = dataStr.split("-").map(Number);
+    const data = new Date(ano, mes - 1, dia);
     return data.getDay();
+}
+
+// Função para verificar se a data está na semana atual (de domingo a sábado)
+function isDataNaSemanaAtual(dataStr) {
+    const data = new Date(dataStr);
+    const hoje = new Date();
+    
+    // Calcula o início e o fim da semana (domingo a sábado)
+    const inicioSemana = new Date(hoje);
+    inicioSemana.setDate(hoje.getDate() - hoje.getDay());
+
+    const fimSemana = new Date(inicioSemana);
+    fimSemana.setDate(inicioSemana.getDate() + 6);
+
+    // Verifica se a data está dentro do intervalo da semana atual
+    return data >= inicioSemana && data <= fimSemana;
 }
 
 // Array dos nomes dos dias da semana para facilitar a marcação no HTML
 const diasDaSemana = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
+// Função para limpar a classe `present` dos dias, garantindo que o estilo seja aplicado apenas nos dias dinâmicos
+function limparEstiloDias() {
+    document.querySelectorAll(".day").forEach(elemento => {
+        elemento.classList.remove("present");
+    });
+}
+
 // Função para marcar os dias de treino na interface
 function marcarDiasDeTreino(treinoDatas) {
     console.log("Chamando marcarDiasDeTreino com:", treinoDatas);
+    limparEstiloDias(); // Remove o estilo `present` de todos os dias antes de aplicar nos dias específicos
+    
     treinoDatas.forEach(data => {
-        const diaSemana = obterDiaSemana(data);
-        const elementoDia = document.querySelector(`.day[data-dia='${diasDaSemana[diaSemana]}']`);
-        if (elementoDia) {
-            if (!elementoDia.querySelector('.icon-check')) {
-                elementoDia.classList.add("present");
-                
-                const iconCheck = document.createElement("span");
-                iconCheck.classList.add("icon-check");
-                iconCheck.innerHTML = "✓";
-                elementoDia.appendChild(iconCheck);
-                console.log(`Ícone de verificação adicionado para o dia: ${diasDaSemana[diaSemana]}`);
+        // Verifica se a data está na semana atual
+        if (isDataNaSemanaAtual(data)) {
+            const diaSemana = obterDiaSemana(data);
+            const elementoDia = document.querySelector(`.day[data-dia='${diasDaSemana[diaSemana]}']`);
+            if (elementoDia) {
+                elementoDia.classList.add("present"); // Adiciona a classe `present` para marcar o dia dinamicamente
+                console.log(`Dia de treino marcado para: ${diasDaSemana[diaSemana]}`);
             } else {
-                console.log(`Ícone já existe para o dia: ${diasDaSemana[diaSemana]}`);
+                console.warn(`Elemento do dia ${diasDaSemana[diaSemana]} não encontrado.`);
             }
         } else {
-            console.warn(`Elemento do dia ${diasDaSemana[diaSemana]} não encontrado.`);
+            console.log(`Data ${data} não está na semana atual e será ignorada.`);
         }
     });
 }
 
+// Função para buscar as datas de treino dos últimos 7 dias do servidor
 async function buscarDatasTreino() {
     if (!cpfAluno) {
         console.error('CPF do aluno não encontrado no localStorage.');
@@ -76,14 +91,6 @@ async function buscarDatasTreino() {
             
             // Marca os dias de treino na interface com as datas obtidas do servidor
             marcarDiasDeTreino(datasDeTreino);
-
-            // Exibe as datas de treino em uma lista para visualização
-            const treinoContainer = document.getElementById('treinoDatasContainer');
-            if (treinoContainer) {
-                treinoContainer.innerHTML = datasDeTreino.map(data => `<li>${data}</li>`).join('');
-            } else {
-                console.warn("Elemento treinoDatasContainer não encontrado no DOM.");
-            }
         } else {
             console.error('Erro ao buscar as datas de treino. Status:', response.status);
         }
@@ -92,6 +99,7 @@ async function buscarDatasTreino() {
     }
 }
 
+// Executa a função de busca das datas de treino ao carregar a página
 document.addEventListener('DOMContentLoaded', () => {
     console.log("Página carregada. Iniciando buscarDatasTreino...");
     buscarDatasTreino();

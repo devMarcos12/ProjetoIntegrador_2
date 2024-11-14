@@ -8,25 +8,39 @@
     <title>Classificação</title>
 </head>
 <body>
-    <div class="page-container">
-        <div class="classification-container">
-            <h1 id="nomeAlunoTitulo">Bem-vindo(a)</h1>
-            <p><strong>Classificação Atual:</strong><br><span id="classificacaoAluno"></span></p>
-            <p><strong>Horas Treinadas por Semana:</strong><br><span id="horasTreinadas"></span> horas</p>
+    <div class="container">
+        <div class="card">
+            <h1 id="nomeAlunoTitulo">Bem-vindo(a), Nome do Aluno</h1>
+            
+            <div class="info-section">
+                <div class="info-box">
+                    <span class="icon">🏅</span>
+                    <div>
+                        <span>Classificação Atual:</span>
+                        <strong id="classificacaoAluno">Intermediário</strong>
+                    </div>
+                </div>
+                <div class="info-box">
+                    <span class="icon">⏱️</span>
+                    <div>
+                        <span>Horas Treinadas:</span>
+                        <strong id="horasTreinadas">9 horas</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="calendar">
+                <div class="day" data-dia="Dom">Dom <span class="circle"></span></div>
+                <div class="day" data-dia="Seg">Seg <span class="circle"></span></div>
+                <div class="day" data-dia="Ter">Ter <span class="circle"></span></div>
+                <div class="day" data-dia="Qua">Qua <span class="circle"></span></div>
+                <div class="day" data-dia="Qui">Qui <span class="circle"></span></div>
+                <div class="day" data-dia="Sex">Sex <span class="circle"></span></div>
+                <div class="day" data-dia="Sáb">Sáb <span class="circle"></span></div>
+            </div>
 
             <button class="logout-button" onclick="window.location.href='./index_login.html'">Logout</button>
         </div>
-
-        <div class="attendance-container">
-            <div class="day" data-dia="Dom">Dom</div>
-            <div class="day" data-dia="Seg">Seg</div>
-            <div class="day" data-dia="Ter">Ter</div>
-            <div class="day" data-dia="Qua">Qua</div>
-            <div class="day" data-dia="Qui">Qui</div>
-            <div class="day" data-dia="Sex">Sex</div>
-            <div class="day" data-dia="Sáb">Sáb</div>
-        </div>   
-
     </div>
        
     <script src="./Js/user_info.js"></script>   
