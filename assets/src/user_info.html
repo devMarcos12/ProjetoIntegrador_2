@@ -8,12 +8,27 @@
     <title>Classificação</title>
 </head>
 <body>
-    <div class="classification-container">
-        <h1 id="nomeAlunoTitulo">Bem-vindo(a)</h1>
-        <p><strong>Classificação Atual:</strong><br><span id="classificacaoAluno"></span></p>
-        <p><strong>Horas Treinadas por Semana:</strong><br><span id="horasTreinadas"></span> horas</p>
-        <button class="logout-button" onclick="window.location.href='./index_login.html'">Logout</button>
+    <div class="page-container">
+        <div class="classification-container">
+            <h1 id="nomeAlunoTitulo">Bem-vindo(a)</h1>
+            <p><strong>Classificação Atual:</strong><br><span id="classificacaoAluno"></span></p>
+            <p><strong>Horas Treinadas por Semana:</strong><br><span id="horasTreinadas"></span> horas</p>
+
+            <button class="logout-button" onclick="window.location.href='./index_login.html'">Logout</button>
+        </div>
+
+        <div class="attendance-container">
+            <div class="day" data-dia="Dom">Dom</div>
+            <div class="day" data-dia="Seg">Seg</div>
+            <div class="day" data-dia="Ter">Ter</div>
+            <div class="day" data-dia="Qua">Qua</div>
+            <div class="day" data-dia="Qui">Qui</div>
+            <div class="day" data-dia="Sex">Sex</div>
+            <div class="day" data-dia="Sáb">Sáb</div>
+        </div>   
+
     </div>
-    <script src="./Js/user_info.js"></script>
+       
+    <script src="./Js/user_info.js"></script>   
 </body>
 </html>

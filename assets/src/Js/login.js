@@ -29,6 +29,7 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
                 localStorage.setItem('nomeAluno', studentInfo.aluno_nome);
                 localStorage.setItem('horasTreinadas', studentInfo.horas_treinadas);
                 localStorage.setItem('classificacao', studentInfo.classificacao);
+                localStorage.setItem('cpfAluno', studentInfo.aluno_cpf);
                 window.location.href = './user_info.html';
             } else if (infoResponse.status === 404) {
                 alert('Informações do aluno não encontradas.');

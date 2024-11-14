@@ -114,11 +114,12 @@ routes.post('/getStudentInfo', async (req: Request, res: Response) => {
     connection = await DataBase.connect();
     console.log('Conexão com o banco de dados estabelecida');
 
-    // Consulta para obter horas treinadas e classificação do aluno
+    // Consulta para obter horas treinadas, classificação e CPF do aluno
     const query = `
       SELECT 
           a.id AS aluno_id,
           a.name AS aluno_nome,
+          a.cpf AS aluno_cpf, -- Inclui o CPF no retorno
           NVL(SUM(r.duracao), 0) AS horas_treinadas,
           CASE
               WHEN NVL(SUM(r.duracao), 0) <= 5 THEN 'Iniciante'
@@ -135,7 +136,7 @@ routes.post('/getStudentInfo', async (req: Request, res: Response) => {
       WHERE 
           LOWER(a.name) = :name
       GROUP BY 
-          a.id, a.name
+          a.id, a.name, a.cpf
     `;
 
     const result = await connection.execute(query, [name.toLowerCase()]);
@@ -143,10 +144,11 @@ routes.post('/getStudentInfo', async (req: Request, res: Response) => {
     const rows = result.rows as any[][];
 
     if (rows && rows.length > 0) {
-      const [aluno_id, aluno_nome, horas_treinadas, classificacao] = rows[0];
+      const [aluno_id, aluno_nome, aluno_cpf, horas_treinadas, classificacao] = rows[0];
       console.log('Dados do aluno encontrados:', {
         aluno_id,
         aluno_nome,
+        aluno_cpf,
         horas_treinadas,
         classificacao
       });
@@ -154,6 +156,7 @@ routes.post('/getStudentInfo', async (req: Request, res: Response) => {
       res.status(200).json({
         aluno_id,
         aluno_nome,
+        aluno_cpf,
         horas_treinadas,
         classificacao
       });
@@ -171,6 +174,49 @@ routes.post('/getStudentInfo', async (req: Request, res: Response) => {
     }
   }
 });
+
+
+routes.get('/last7days/:cpf', async (req: Request, res: Response) => {
+  const { cpf } = req.params;
+  let connection;
+
+  try {
+    connection = await DataBase.connect();
+
+    // Consulta para buscar as datas de treino dos últimos 7 dias
+    const query = `
+      SELECT TO_CHAR(horario_entrada, 'YYYY-MM-DD') AS data_treino
+      FROM registro_treino
+      WHERE fk_aluno_cpf = :cpf
+      AND horario_entrada >= TRUNC(SYSDATE) - 7
+      ORDER BY horario_entrada DESC
+    `;
+
+    const result = await connection.execute(query, [cpf]);
+    const rows = result.rows as any[][];
+
+    // Verifica se encontrou resultados
+    if (rows && rows.length > 0) {
+      // Mapeia as datas em um array simples
+      const datasDeTreino = rows.map(row => row[0]);
+
+      console.log('Datas de treino encontradas:', datasDeTreino);
+      res.status(200).json(datasDeTreino);
+    } else {
+      console.log('Nenhuma data de treino encontrada');
+      res.status(404).json({ message: 'Nenhuma data de treino encontrada nos últimos 7 dias' });
+    }
+  } catch (err) {
+    console.error('Erro ao buscar as datas de treino:', err);
+    res.status(500).send('Erro ao processar a solicitação.');
+  } finally {
+    if (connection) {
+      await DataBase.close(connection);
+      console.log('Conexão com o banco de dados fechada');
+    }
+  }
+});
+
 
 app.use(routes);
 
