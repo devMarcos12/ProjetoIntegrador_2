@@ -219,6 +219,102 @@ routes.get('/last7days/:cpf', async (req, res) => {
         }
     }
 });
+routes.post('/registerEntry', async (req, res) => {
+    const { cpf } = req.body;
+    // Setting the correctly
+    const horarioEntrada = new Date().toLocaleString('sv-SE', { timeZone: 'America/Sao_Paulo' }).replace('T', ' ');
+    let connection;
+    console.log(`[Entrada] Recebida requisição para registrar entrada. CPF: ${cpf}`);
+    console.log(`[Entrada] Horário local registrado: ${horarioEntrada}`);
+    try {
+        connection = await connection_1.default.connect();
+        console.log('[Entrada] Conexão com o banco de dados estabelecida.');
+        const insertQuery = `
+      INSERT INTO registro_treino (fk_aluno_cpf, horario_entrada)
+      VALUES (:cpf, TO_TIMESTAMP(:horarioEntrada, 'YYYY-MM-DD HH24:MI:SS'))
+    `;
+        await connection.execute(insertQuery, {
+            cpf,
+            horarioEntrada,
+        });
+        await connection.commit();
+        console.log('[Entrada] Registro de entrada inserido com sucesso no banco de dados.');
+        res.status(201).json({ message: 'Entrada registrada com sucesso!' });
+    }
+    catch (err) {
+        console.error('[Entrada] Erro ao registrar entrada:', err);
+        res.status(500).json({ message: 'Erro ao registrar entrada.' });
+    }
+    finally {
+        if (connection) {
+            await connection_1.default.close(connection);
+            console.log('[Entrada] Conexão com o banco de dados fechada.');
+        }
+    }
+});
+routes.post('/registerExit', async (req, res) => {
+    const { cpf } = req.body;
+    const horarioSaida = new Date();
+    let connection;
+    console.log(`[Saída] Recebida requisição para registrar saída. CPF: ${cpf}`);
+    try {
+        connection = await connection_1.default.connect();
+        console.log('[Saída] Conexão com o banco de dados estabelecida.');
+        const selectQuery = `
+      SELECT CAST(horario_entrada AS TIMESTAMP WITH TIME ZONE) AT TIME ZONE 'America/Sao_Paulo' AS horario_entrada
+      FROM registro_treino
+      WHERE fk_aluno_cpf = :cpf AND horario_saida IS NULL
+      ORDER BY horario_entrada DESC
+      FETCH FIRST 1 ROWS ONLY
+    `;
+        const result = await connection.execute(selectQuery, { cpf });
+        const rows = result.rows;
+        if (rows && rows.length > 0) {
+            const horarioEntrada = new Date(rows[0][0]);
+            // Extrair apenas as horas completas
+            const entradaHoras = horarioEntrada.getHours();
+            const saidaHoras = horarioSaida.getHours();
+            // Calcular a diferença de horas
+            let duracao = saidaHoras - entradaHoras;
+            // Garantir que a duração seja positiva (contabilizar o próximo dia)
+            if (duracao < 0) {
+                duracao += 24;
+            }
+            console.log('[Saída] Registro de entrada encontrado.');
+            console.log(`[Saída] Horário de entrada ajustado: ${horarioEntrada}`);
+            console.log(`[Saída] Horário de saída: ${horarioSaida}`);
+            console.log(`[Saída] Duração ajustada: ${duracao} horas`);
+            const updateQuery = `
+        UPDATE registro_treino
+        SET horario_saida = TO_TIMESTAMP(:horarioSaida, 'YYYY-MM-DD HH24:MI:SS'),
+            duracao = :duracao
+        WHERE fk_aluno_cpf = :cpf AND horario_saida IS NULL
+      `;
+            await connection.execute(updateQuery, {
+                horarioSaida: horarioSaida.toISOString().replace('T', ' ').slice(0, 19),
+                duracao,
+                cpf,
+            });
+            await connection.commit();
+            console.log('[Saída] Registro atualizado com sucesso no banco de dados.');
+            res.status(200).json({ message: 'Saída registrada com sucesso!', duracao });
+        }
+        else {
+            console.warn('[Saída] Nenhum registro de entrada encontrado para este CPF.');
+            res.status(404).json({ message: 'Nenhum registro de entrada encontrado para este CPF.' });
+        }
+    }
+    catch (err) {
+        console.error('[Saída] Erro ao registrar saída:', err);
+        res.status(500).json({ message: 'Erro ao registrar saída.' });
+    }
+    finally {
+        if (connection) {
+            await connection_1.default.close(connection);
+            console.log('[Saída] Conexão com o banco de dados fechada.');
+        }
+    }
+});
 app.use(routes);
 app.listen(port, () => {
     console.log(`Servidor rodando na porta ${port}`);

@@ -46,3 +46,23 @@ function mostrarFormulario(botao) {
 // clique
 btnEntrada.addEventListener('click', () => mostrarFormulario(btnEntrada));
 btnSaida.addEventListener('click', () => mostrarFormulario(btnSaida));
+
+btnEnviarEntrada.addEventListener('click', async () => {
+    const cpf = document.getElementById('cpf').value;
+    await fetch('http://localhost:3000/registerEntry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cpf }),
+    });
+    alert('Entrada registrada com sucesso!');
+});
+
+btnEnviarSaida.addEventListener('click', async () => {
+    const cpf = document.getElementById('cpf').value;
+    await fetch('http://localhost:3000/registerExit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cpf }),
+    });
+    alert('Saída registrada com sucesso!');
+});
