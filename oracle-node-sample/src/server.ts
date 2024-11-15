@@ -220,7 +220,7 @@ routes.get('/last7days/:cpf', async (req: Request, res: Response) => {
 routes.post('/registerEntry', async (req: Request, res: Response) => {
   const { cpf } = req.body;
 
-  // Setting the correctly
+  // Setting the correctly timeZonw to ensure get the America/SaoPaulo
   const horarioEntrada = new Date().toLocaleString('sv-SE', { timeZone: 'America/Sao_Paulo' }).replace('T', ' ');
 
   let connection;
