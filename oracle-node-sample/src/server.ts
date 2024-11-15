@@ -232,11 +232,11 @@ routes.post('/registerEntry', async (req: Request, res: Response) => {
     connection = await DataBase.connect();
     console.log('[Entrada] Conexão com o banco de dados estabelecida.');
 
-    const insertQuery = `
+    const Query = `
       INSERT INTO registro_treino (fk_aluno_cpf, horario_entrada)
       VALUES (:cpf, TO_TIMESTAMP(:horarioEntrada, 'YYYY-MM-DD HH24:MI:SS'))
     `;
-    await connection.execute(insertQuery, {
+    await connection.execute(Query, {
       cpf,
       horarioEntrada,
     });
@@ -267,14 +267,14 @@ routes.post('/registerExit', async (req: Request, res: Response) => {
     connection = await DataBase.connect();
     console.log('[Saída] Conexão com o banco de dados estabelecida.');
 
-    const selectQuery = `
+    const Query = `
       SELECT CAST(horario_entrada AS TIMESTAMP WITH TIME ZONE) AT TIME ZONE 'America/Sao_Paulo' AS horario_entrada
       FROM registro_treino
       WHERE fk_aluno_cpf = :cpf AND horario_saida IS NULL
       ORDER BY horario_entrada DESC
       FETCH FIRST 1 ROWS ONLY
     `;
-    const result = await connection.execute(selectQuery, { cpf });
+    const result = await connection.execute(Query, { cpf });
     const rows = result.rows as any[][];
 
     if (rows && rows.length > 0) {

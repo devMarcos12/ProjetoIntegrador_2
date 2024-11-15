@@ -221,7 +221,7 @@ routes.get('/last7days/:cpf', async (req, res) => {
 });
 routes.post('/registerEntry', async (req, res) => {
     const { cpf } = req.body;
-    // Setting the correctly
+    // Setting the correctly timeZonw to ensure get the America/SaoPaulo
     const horarioEntrada = new Date().toLocaleString('sv-SE', { timeZone: 'America/Sao_Paulo' }).replace('T', ' ');
     let connection;
     console.log(`[Entrada] Recebida requisição para registrar entrada. CPF: ${cpf}`);
@@ -229,11 +229,11 @@ routes.post('/registerEntry', async (req, res) => {
     try {
         connection = await connection_1.default.connect();
         console.log('[Entrada] Conexão com o banco de dados estabelecida.');
-        const insertQuery = `
+        const Query = `
       INSERT INTO registro_treino (fk_aluno_cpf, horario_entrada)
       VALUES (:cpf, TO_TIMESTAMP(:horarioEntrada, 'YYYY-MM-DD HH24:MI:SS'))
     `;
-        await connection.execute(insertQuery, {
+        await connection.execute(Query, {
             cpf,
             horarioEntrada,
         });
@@ -260,14 +260,14 @@ routes.post('/registerExit', async (req, res) => {
     try {
         connection = await connection_1.default.connect();
         console.log('[Saída] Conexão com o banco de dados estabelecida.');
-        const selectQuery = `
+        const Query = `
       SELECT CAST(horario_entrada AS TIMESTAMP WITH TIME ZONE) AT TIME ZONE 'America/Sao_Paulo' AS horario_entrada
       FROM registro_treino
       WHERE fk_aluno_cpf = :cpf AND horario_saida IS NULL
       ORDER BY horario_entrada DESC
       FETCH FIRST 1 ROWS ONLY
     `;
-        const result = await connection.execute(selectQuery, { cpf });
+        const result = await connection.execute(Query, { cpf });
         const rows = result.rows;
         if (rows && rows.length > 0) {
             const horarioEntrada = new Date(rows[0][0]);
