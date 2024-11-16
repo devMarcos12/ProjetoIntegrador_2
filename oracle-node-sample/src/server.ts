@@ -68,27 +68,22 @@ routes.post('/register', async (req: Request, res: Response) => {
 });
 
 routes.post('/login', async (req: Request, res: Response) => {
-  console.log('Recebendo requisição no endpoint /login');
-
-  const { name } = req.body;
+  const { cpf } = req.body;
   let connection;
 
-  console.log('Dados recebidos (JSON):', req.body);
+  console.debug("CPF recebido: ", cpf)
 
   try {
     connection = await DataBase.connect();
-    console.log('Conexão com o banco de dados estabelecida');
 
-    const query = `SELECT name FROM alunos WHERE LOWER(name) = :name`;
-    const result = await connection.execute(query, [name.toLowerCase()]);
+    const query = `SELECT cpf FROM alunos WHERE cpf = :cpf`;
+    const result = await connection.execute(query, [cpf]);
 
-    const rows = result.rows as any[][]; // Faz o casting para any[][]
+    const rows = result.rows as any[][];
 
     if (rows && rows.length > 0) {
-      console.log('Usuário encontrado:', rows[0][0]);
       res.status(200).json({ message: 'Login bem-sucedido', user: rows[0][0] });
     } else {
-      console.log('Usuário não encontrado');
       res.status(404).json({ message: 'Usuário não encontrado' });
     }
   } catch (err) {
@@ -97,29 +92,22 @@ routes.post('/login', async (req: Request, res: Response) => {
   } finally {
     if (connection) {
       await DataBase.close(connection);
-      console.log('Conexão com o banco de dados fechada');
     }
   }
 });
 
 routes.post('/getStudentInfo', async (req: Request, res: Response) => {
-  console.log('Recebendo requisição no endpoint /getStudentInfo');
-
-  const { name } = req.body;
+  const { cpf } = req.body;
   let connection;
-
-  console.log('Dados recebidos (JSON):', req.body);
 
   try {
     connection = await DataBase.connect();
-    console.log('Conexão com o banco de dados estabelecida');
 
-    // Consulta para obter horas treinadas, classificação e CPF do aluno
     const query = `
       SELECT 
           a.id AS aluno_id,
           a.name AS aluno_nome,
-          a.cpf AS aluno_cpf, -- Inclui o CPF no retorno
+          a.cpf AS aluno_cpf,
           NVL(SUM(r.duracao), 0) AS horas_treinadas,
           CASE
               WHEN NVL(SUM(r.duracao), 0) <= 5 THEN 'Iniciante'
@@ -134,24 +122,17 @@ routes.post('/getStudentInfo', async (req: Request, res: Response) => {
           registro_treino r ON a.cpf = r.fk_aluno_cpf
           AND r.horario_entrada >= TRUNC(SYSDATE) - 7
       WHERE 
-          LOWER(a.name) = :name
+          a.cpf = :cpf
       GROUP BY 
           a.id, a.name, a.cpf
     `;
 
-    const result = await connection.execute(query, [name.toLowerCase()]);
+    const result = await connection.execute(query, [cpf]);
 
     const rows = result.rows as any[][];
 
     if (rows && rows.length > 0) {
       const [aluno_id, aluno_nome, aluno_cpf, horas_treinadas, classificacao] = rows[0];
-      console.log('Dados do aluno encontrados:', {
-        aluno_id,
-        aluno_nome,
-        aluno_cpf,
-        horas_treinadas,
-        classificacao
-      });
 
       res.status(200).json({
         aluno_id,
@@ -161,7 +142,6 @@ routes.post('/getStudentInfo', async (req: Request, res: Response) => {
         classificacao
       });
     } else {
-      console.log('Aluno não encontrado');
       res.status(404).json({ message: 'Aluno não encontrado' });
     }
   } catch (err) {
@@ -170,10 +150,10 @@ routes.post('/getStudentInfo', async (req: Request, res: Response) => {
   } finally {
     if (connection) {
       await DataBase.close(connection);
-      console.log('Conexão com o banco de dados fechada');
     }
   }
 });
+
 
 
 routes.get('/last7days/:cpf', async (req: Request, res: Response) => {
@@ -200,7 +180,7 @@ routes.get('/last7days/:cpf', async (req: Request, res: Response) => {
       // Mapeia as datas em um array simples
       const datasDeTreino = rows.map(row => row[0]);
 
-      console.log('Datas de treino encontradas:', datasDeTreino);
+      console.debug('Datas de treino encontradas:', datasDeTreino);
       res.status(200).json(datasDeTreino);
     } else {
       console.log('Nenhuma data de treino encontrada');
