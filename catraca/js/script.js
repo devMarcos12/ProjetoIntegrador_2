@@ -1,3 +1,16 @@
+function CPFmodel(cpf) {
+    cpf = cpf.replace(/\D/g, ''); // Just accepts number characters
+    cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2'); // Add a point after 3 first numbers
+    cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2'); // Add a point after 6 first numbers
+    cpf = cpf.replace(/(\d{3})(\d{1,2})$/, '$1-$2'); // Add "-" before last two digits
+    return cpf;
+}
+
+// Apply the functions to the specified fields (cpf, phone)
+document.getElementById('cpf').addEventListener('input', (event) => {
+    event.target.value = CPFmodel(event.target.value);
+});
+
 // relogio 
 function atualizarRelogio() {
     const agora = new Date();
