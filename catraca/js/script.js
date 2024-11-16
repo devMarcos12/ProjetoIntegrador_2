@@ -56,19 +56,64 @@ function mostrarFormulario(botao) {
     }
 }
 
-// clique
 btnEntrada.addEventListener('click', () => mostrarFormulario(btnEntrada));
 btnSaida.addEventListener('click', () => mostrarFormulario(btnSaida));
 
 btnEnviarEntrada.addEventListener('click', async () => {
-    const cpf = document.getElementById('cpf').value;
-    await fetch('http://localhost:3000/registerEntry', {
+    const cpfField = document.getElementById('cpf');
+    const cpf = cpfField.value;
+
+    // Enviar requisição para o servidor
+    const response = await fetch('http://localhost:3000/registerEntry', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cpf }),
     });
-    alert('Entrada registrada com sucesso!');
+
+    if (response.ok) {
+        alert('Entrada registrada com sucesso!');
+
+        // Limpar o campo CPF
+        cpfField.value = '';
+
+        // Esconder o formulário e o botão após o envio
+        cpfForm.style.display = 'none';
+        btnEnviarEntrada.style.display = 'none';
+    } else if (response.status === 409) {
+        alert('CPF não encontrado. Tente novamente.');
+    } else {
+        alert(`Erro ao registrar entrada, tente novamente.`);
+    }
 });
+
+btnEnviarSaida.addEventListener('click', async () => {
+    const cpfField = document.getElementById('cpf');
+    const cpf = cpfField.value;
+
+    // Enviar requisição para o servidor
+    const response = await fetch('http://localhost:3000/registerExit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cpf }),
+    });
+
+    if (response.ok) {
+        alert('Saída registrada com sucesso!');
+
+        // Limpar o campo CPF
+        cpfField.value = '';
+
+        // Esconder o formulário e o botão após o envio
+        cpfForm.style.display = 'none';
+        btnEnviarSaida.style.display = 'none';
+    } else if (response.status === 409) {
+        alert('CPF não encontrado. Tente novamente.');
+    } else {
+        alert(`Erro ao registrar saída, tente novamente.`);
+    }
+});
+
+
 
 btnEnviarSaida.addEventListener('click', async () => {
     const cpf = document.getElementById('cpf').value;
