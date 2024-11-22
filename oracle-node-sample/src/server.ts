@@ -108,12 +108,12 @@ routes.post('/getStudentInfo', async (req: Request, res: Response) => {
           a.id AS aluno_id,
           a.name AS aluno_nome,
           a.cpf AS aluno_cpf,
-          NVL(SUM(r.duracao), 0) AS horas_treinadas,
+          NVL(SUM(r.duracao), 0) AS total_minutos, -- Total em minutos
           CASE
-              WHEN NVL(SUM(r.duracao), 0) <= 5 THEN 'Iniciante'
-              WHEN NVL(SUM(r.duracao), 0) BETWEEN 6 AND 10 THEN 'Intermediário'
-              WHEN NVL(SUM(r.duracao), 0) BETWEEN 11 AND 20 THEN 'Avançado'
-              WHEN NVL(SUM(r.duracao), 0) > 20 THEN 'Extremamente Avançado'
+              WHEN NVL(SUM(r.duracao), 0) / 60 <= 5 THEN 'Iniciante'
+              WHEN NVL(SUM(r.duracao), 0) / 60 BETWEEN 6 AND 10 THEN 'Intermediário'
+              WHEN NVL(SUM(r.duracao), 0) / 60 BETWEEN 11 AND 20 THEN 'Avançado'
+              WHEN NVL(SUM(r.duracao), 0) / 60 > 20 THEN 'Extremamente Avançado'
               ELSE 'Sem classificação'
           END AS classificacao
       FROM 
@@ -128,11 +128,13 @@ routes.post('/getStudentInfo', async (req: Request, res: Response) => {
     `;
 
     const result = await connection.execute(query, [cpf]);
-
     const rows = result.rows as any[][];
 
     if (rows && rows.length > 0) {
-      const [aluno_id, aluno_nome, aluno_cpf, horas_treinadas, classificacao] = rows[0];
+      const [aluno_id, aluno_nome, aluno_cpf, total_minutos, classificacao] = rows[0];
+
+      // Converte minutos para horas completas (arredondadas para baixo)
+      const horas_treinadas = Math.floor(total_minutos / 60);
 
       res.status(200).json({
         aluno_id,
@@ -165,7 +167,8 @@ routes.get('/last7days/:cpf', async (req: Request, res: Response) => {
 
     // Consulta para buscar as datas de treino dos últimos 7 dias
     const query = `
-      SELECT TO_CHAR(horario_entrada, 'YYYY-MM-DD') AS data_treino
+      SELECT 
+        TO_CHAR(horario_entrada, 'YYYY-MM-DD') AS data_treino
       FROM registro_treino
       WHERE fk_aluno_cpf = :cpf
       AND horario_entrada >= TRUNC(SYSDATE) - 7
@@ -177,17 +180,15 @@ routes.get('/last7days/:cpf', async (req: Request, res: Response) => {
 
     // Verifica se encontrou resultados
     if (rows && rows.length > 0) {
-      // Mapeia as datas em um array simples
-      const datasDeTreino = rows.map(row => row[0]);
-
+      const datasDeTreino = rows.map(row => row[0]); // Extraí as datas
       console.debug('Datas de treino encontradas:', datasDeTreino);
-      res.status(200).json(datasDeTreino);
+      res.status(200).json(datasDeTreino); // Retorna as datas como um array
     } else {
       console.log('Nenhuma data de treino encontrada');
-      res.status(404).json({ message: 'Nenhuma data de treino encontrada nos últimos 7 dias' });
+      res.status(404).json({ message: 'Nenhuma atividade registrada nos últimos 7 dias' });
     }
   } catch (err) {
-    console.error('Erro ao buscar as datas de treino:', err);
+    console.error('Erro ao buscar os registros de treino:', err);
     res.status(500).send('Erro ao processar a solicitação.');
   } finally {
     if (connection) {
@@ -196,6 +197,7 @@ routes.get('/last7days/:cpf', async (req: Request, res: Response) => {
     }
   }
 });
+
 
 routes.post('/registerEntry', async (req: Request, res: Response) => {
   const { cpf } = req.body;
