@@ -238,7 +238,7 @@ routes.post('/registerEntry', async (req: Request, res: Response) => {
 
 routes.post('/registerExit', async (req: Request, res: Response) => {
   const { cpf } = req.body;
-  const horarioSaida = new Date();
+  const horarioSaida = new Date(); // Momento atual
   let connection;
 
   console.log(`[Saída] Recebida requisição para registrar saída. CPF: ${cpf}`);
@@ -247,6 +247,7 @@ routes.post('/registerExit', async (req: Request, res: Response) => {
     connection = await DataBase.connect();
     console.log('[Saída] Conexão com o banco de dados estabelecida.');
 
+    // Buscar o horário de entrada mais recente sem saída
     const Query = `
       SELECT CAST(horario_entrada AS TIMESTAMP WITH TIME ZONE) AT TIME ZONE 'America/Sao_Paulo' AS horario_entrada
       FROM registro_treino
@@ -258,25 +259,20 @@ routes.post('/registerExit', async (req: Request, res: Response) => {
     const rows = result.rows as any[][];
 
     if (rows && rows.length > 0) {
-      const horarioEntrada = new Date(rows[0][0]);
+      const horarioEntrada = new Date(rows[0][0]); // Converte o horário de entrada para um objeto Date
 
-      // Extrair apenas as horas completas
-      const entradaHoras = horarioEntrada.getHours();
-      const saidaHoras = horarioSaida.getHours();
+      // Calcular a diferença em milissegundos
+      const diferencaMillis = horarioSaida.getTime() - horarioEntrada.getTime();
 
-      // Calcular a diferença de horas
-      let duracao = saidaHoras - entradaHoras;
-
-      // Garantir que a duração seja positiva (contabilizar o próximo dia)
-      if (duracao < 0) {
-        duracao += 24;
-      }
+      // Converter para minutos
+      const duracaoEmMinutos = Math.ceil(diferencaMillis / (1000 * 60));
 
       console.log('[Saída] Registro de entrada encontrado.');
       console.log(`[Saída] Horário de entrada ajustado: ${horarioEntrada}`);
       console.log(`[Saída] Horário de saída: ${horarioSaida}`);
-      console.log(`[Saída] Duração ajustada: ${duracao} horas`);
+      console.log(`[Saída] Duração calculada: ${duracaoEmMinutos} minutos`);
 
+      // Atualizar o registro no banco
       const updateQuery = `
         UPDATE registro_treino
         SET horario_saida = TO_TIMESTAMP(:horarioSaida, 'YYYY-MM-DD HH24:MI:SS'),
@@ -285,13 +281,13 @@ routes.post('/registerExit', async (req: Request, res: Response) => {
       `;
       await connection.execute(updateQuery, {
         horarioSaida: horarioSaida.toISOString().replace('T', ' ').slice(0, 19),
-        duracao,
+        duracao: duracaoEmMinutos,
         cpf,
       });
 
       await connection.commit();
       console.log('[Saída] Registro atualizado com sucesso no banco de dados.');
-      res.status(200).json({ message: 'Saída registrada com sucesso!', duracao });
+      res.status(200).json({ message: 'Saída registrada com sucesso!', duracao: duracaoEmMinutos });
     } else {
       console.warn('[Saída] Nenhum registro de entrada encontrado para este CPF.');
       res.status(404).json({ message: 'Nenhum registro de entrada encontrado para este CPF.' });
@@ -306,6 +302,7 @@ routes.post('/registerExit', async (req: Request, res: Response) => {
     }
   }
 });
+
 
 
 

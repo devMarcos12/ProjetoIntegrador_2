@@ -1,17 +1,18 @@
+// Função para formatar o CPF
 function CPFmodel(cpf) {
-    cpf = cpf.replace(/\D/g, ''); // Just accepts number characters
-    cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2'); // Add a point after 3 first numbers
-    cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2'); // Add a point after 6 first numbers
-    cpf = cpf.replace(/(\d{3})(\d{1,2})$/, '$1-$2'); // Add "-" before last two digits
+    cpf = cpf.replace(/\D/g, ''); // Remove caracteres não numéricos
+    cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2'); // Adiciona ponto após os primeiros 3 números
+    cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2'); // Adiciona ponto após os primeiros 6 números
+    cpf = cpf.replace(/(\d{3})(\d{1,2})$/, '$1-$2'); // Adiciona "-" antes dos últimos 2 dígitos
     return cpf;
 }
 
-// Apply the functions to the specified fields (cpf, phone)
+// Formata o CPF em tempo real
 document.getElementById('cpf').addEventListener('input', (event) => {
     event.target.value = CPFmodel(event.target.value);
 });
 
-// relogio 
+// Relógio e Data
 function atualizarRelogio() {
     const agora = new Date();
     const horas = agora.getHours().toString().padStart(2, '0');
@@ -23,30 +24,21 @@ function atualizarRelogio() {
 function atualizarData() {
     const agora = new Date();
     const dia = agora.getDate().toString().padStart(2, '0');
-    const mes = (agora.getMonth() + 1).toString().padStart(2, '0'); // mes é 0 a 11(janeiro é 0, por isso o +1)
+    const mes = (agora.getMonth() + 1).toString().padStart(2, '0');
     const ano = agora.getFullYear();
     document.getElementById('data').textContent = `${dia}/${mes}/${ano}`;
 }
 
-
 setInterval(atualizarRelogio, 1000);
 setInterval(atualizarData, 1000);
 
-
-// troca de botao
-const btnEntrada = document.getElementById('entrada');
-const btnSaida = document.getElementById('saida');
-const cpfForm = document.getElementById('cpf-form');
-const btnEnviarEntrada = document.getElementById('enviar-entrada');
-const btnEnviarSaida = document.getElementById('enviar-saida');
-
+// Função para mostrar o formulário e ajustar os botões
 function mostrarFormulario(botao) {
     btnEntrada.classList.remove('active');
     btnSaida.classList.remove('active');
     botao.classList.add('active');
     cpfForm.style.display = 'block';
 
-    // mostra o botao certo
     if (botao.id === 'entrada') {
         btnEnviarEntrada.style.display = 'block';
         btnEnviarSaida.style.display = 'none';
@@ -56,71 +48,79 @@ function mostrarFormulario(botao) {
     }
 }
 
+// Referências aos botões
+const btnEntrada = document.getElementById('entrada');
+const btnSaida = document.getElementById('saida');
+const cpfForm = document.getElementById('cpf-form');
+const btnEnviarEntrada = document.getElementById('enviar-entrada');
+const btnEnviarSaida = document.getElementById('enviar-saida');
+
+// Eventos de clique nos botões de entrada e saída
 btnEntrada.addEventListener('click', () => mostrarFormulario(btnEntrada));
 btnSaida.addEventListener('click', () => mostrarFormulario(btnSaida));
 
+// Validação e requisição para entrada
 btnEnviarEntrada.addEventListener('click', async () => {
     const cpfField = document.getElementById('cpf');
-    const cpf = cpfField.value;
+    const cpf = cpfField.value.trim();
 
-    // Enviar requisição para o servidor
-    const response = await fetch('http://localhost:3000/registerEntry', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cpf }),
-    });
+    if (!cpf) {
+        alert('Por favor, insira um CPF válido.');
+        return;
+    }
 
-    if (response.ok) {
-        alert('Entrada registrada com sucesso!');
+    try {
+        const response = await fetch('http://localhost:3000/registerEntry', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cpf }),
+        });
 
-        // Limpar o campo CPF
-        cpfField.value = '';
-
-        // Esconder o formulário e o botão após o envio
-        cpfForm.style.display = 'none';
-        btnEnviarEntrada.style.display = 'none';
-    } else if (response.status === 409) {
-        alert('CPF não encontrado. Tente novamente.');
-    } else {
-        alert(`Erro ao registrar entrada, tente novamente.`);
+        if (response.ok) {
+            alert('Entrada registrada com sucesso!');
+            cpfField.value = '';
+            cpfForm.style.display = 'none';
+        } else if (response.status === 409) {
+            alert('CPF não encontrado. Por favor, registre-se antes.');
+        } else {
+            const errorData = await response.json();
+            alert(`Erro ao registrar entrada: ${errorData.message || 'Erro desconhecido'}`);
+        }
+    } catch (err) {
+        console.error(err);
+        alert('Erro ao conectar com o servidor. Tente novamente mais tarde.');
     }
 });
 
+// Validação e requisição para saída
 btnEnviarSaida.addEventListener('click', async () => {
     const cpfField = document.getElementById('cpf');
-    const cpf = cpfField.value;
+    const cpf = cpfField.value.trim();
 
-    // Enviar requisição para o servidor
-    const response = await fetch('http://localhost:3000/registerExit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cpf }),
-    });
-
-    if (response.ok) {
-        alert('Saída registrada com sucesso!');
-
-        // Limpar o campo CPF
-        cpfField.value = '';
-
-        // Esconder o formulário e o botão após o envio
-        cpfForm.style.display = 'none';
-        btnEnviarSaida.style.display = 'none';
-    } else if (response.status === 409) {
-        alert('CPF não encontrado. Tente novamente.');
-    } else {
-        alert(`Erro ao registrar saída, tente novamente.`);
+    if (!cpf) {
+        alert('Por favor, insira um CPF válido.');
+        return;
     }
-});
 
+    try {
+        const response = await fetch('http://localhost:3000/registerExit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cpf }),
+        });
 
-
-btnEnviarSaida.addEventListener('click', async () => {
-    const cpf = document.getElementById('cpf').value;
-    await fetch('http://localhost:3000/registerExit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cpf }),
-    });
-    alert('Saída registrada com sucesso!');
+        if (response.ok) {
+            alert('Saída registrada com sucesso!');
+            cpfField.value = '';
+            cpfForm.style.display = 'none';
+        } else if (response.status === 409) {
+            alert('CPF não encontrado. Por favor, registre-se antes.');
+        } else {
+            const errorData = await response.json();
+            alert(`Erro ao registrar saída: ${errorData.message || 'Erro desconhecido'}`);
+        }
+    } catch (err) {
+        console.error(err);
+        alert('Erro ao conectar com o servidor. Tente novamente mais tarde.');
+    }
 });
