@@ -305,8 +305,40 @@ routes.post('/registerExit', async (req: Request, res: Response) => {
   }
 });
 
+routes.get('/ranking-geral', async (_req: Request, res: Response) => {
+  let connection;
 
+  try {
+    connection = await DataBase.connect();
 
+    const query = `
+      SELECT 
+          a.name AS nome_completo,
+          a.cpf,
+          FLOOR(NVL(SUM(r.duracao), 0) / 60) AS horas_treinadas -- Converte minutos para horas
+      FROM 
+          alunos a
+      LEFT JOIN 
+          registro_treino r ON a.cpf = r.fk_aluno_cpf
+      GROUP BY 
+          a.name, a.cpf
+      ORDER BY 
+          horas_treinadas DESC
+    `;
+
+    const result = await connection.execute(query);
+    const rows = result.rows;
+
+    res.status(200).json(rows);
+  } catch (err) {
+    console.error('Erro ao buscar ranking geral:', err);
+    res.status(500).send('Erro ao processar a solicitação.');
+  } finally {
+    if (connection) {
+      await DataBase.close(connection);
+    }
+  }
+});
 
 app.use(routes);
 
