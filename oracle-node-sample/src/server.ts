@@ -328,8 +328,8 @@ routes.get('/ranking-semanal', async (_req: Request, res: Response) => {
                   WHEN FLOOR(NVL(t.duracao_treino, 0) / 60) > 20 THEN 'Extremamente Avançado'
                   ELSE 'Sem classificação'
               END AS CLASSIFICACAO,
-              a.name AS ALUNO_NOME,
               a.cpf AS ALUNO_CPF,
+              a.name AS ALUNO_NOME,
               FLOOR(NVL(t.duracao_treino, 0) / 60) AS TOTAL_HORAS_TREINADAS
           FROM alunos a
           LEFT JOIN TreinosRecentes t ON a.cpf = t.fk_aluno_cpf
