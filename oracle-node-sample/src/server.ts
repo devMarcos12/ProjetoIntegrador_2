@@ -305,6 +305,58 @@ routes.post('/registerExit', async (req: Request, res: Response) => {
   }
 });
 
+routes.get('/ranking-semanal', async (_req: Request, res: Response) => {
+  let connection;
+
+  try {
+      connection = await DataBase.connect();
+
+      const query = `
+          WITH TreinosRecentes AS (
+              SELECT 
+                  r.fk_aluno_cpf,
+                  SUM(NVL(r.duracao, 0)) AS duracao_treino
+              FROM registro_treino r
+              WHERE TRUNC(r.horario_entrada) BETWEEN TRUNC(SYSDATE) - 6 AND TRUNC(SYSDATE)
+              GROUP BY r.fk_aluno_cpf
+          )
+          SELECT 
+              CASE
+                  WHEN FLOOR(NVL(t.duracao_treino, 0) / 60) <= 5 THEN 'Iniciante'
+                  WHEN FLOOR(NVL(t.duracao_treino, 0) / 60) BETWEEN 6 AND 10 THEN 'Intermediário'
+                  WHEN FLOOR(NVL(t.duracao_treino, 0) / 60) BETWEEN 11 AND 20 THEN 'Avançado'
+                  WHEN FLOOR(NVL(t.duracao_treino, 0) / 60) > 20 THEN 'Extremamente Avançado'
+                  ELSE 'Sem classificação'
+              END AS CLASSIFICACAO,
+              a.cpf AS ALUNO_CPF,
+              a.name AS ALUNO_NOME,
+              FLOOR(NVL(t.duracao_treino, 0) / 60) AS TOTAL_HORAS_TREINADAS
+          FROM alunos a
+          LEFT JOIN TreinosRecentes t ON a.cpf = t.fk_aluno_cpf
+          ORDER BY CLASSIFICACAO
+      `;
+
+      const result = await connection.execute(query);
+
+      // Mapeando as linhas corretamente. `result.rows` é um array de arrays.
+      const rows = result.rows?.map((row: any) => ({
+          CLASSIFICACAO: row[0],
+          ALUNO_CPF: row[1],
+          ALUNO_NOME: row[2],
+          TOTAL_HORAS_TREINADAS: row[3]
+      }));
+
+      res.status(200).json(rows);
+  } catch (err) {
+      console.error('Erro ao buscar ranking semanal:', err);
+      res.status(500).send('Erro ao processar a solicitação.');
+  } finally {
+      if (connection) {
+          await DataBase.close(connection); // Fecha a conexão com o banco de dados
+      }
+  }
+});
+
 routes.get('/ranking-geral', async (_req: Request, res: Response) => {
   let connection;
 

@@ -12,7 +12,7 @@
     <h1>Ranking dos Alunos (Semanal)</h1>
     <div class="info">
         <div class="quantity-box" id="quantityBox">
-            Quantidade de alunos: <span id="quantity">0</span>
+            Quantidade de alunos: <span id="quantity"> 0</span>
         </div>
         <div class="search-box">
             <label for="search">Pesquisar:</label>
@@ -24,192 +24,18 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>CLASSIFICACAO</th>
+                    <th>CLASSIFICAÇÃO</th>
+                    <th>CPF</th>
                     <th>NOME COMPLETO</th>
-                    <th>SEGUNDA</th>
-                    <th>TERCA</th>
-                    <th>QUARTA</th>
-                    <th>QUINTA</th>
-                    <th>SEXTA</th>
-                    <th>SABADO</th>
-                    <th>DOMINGO</th>
-                    <th>TOTAL</th>
+                    <th>TOTAL DE HORAS TREINADAS</th>
                 </tr>
             </thead>
-            <tbody id="studentTableBody">
-                <!-- Linhas de exemplo -->
-                <tr>
-                    <td>Extremamente avancado</td>
-                    <td>Dean Di Laurentis</td>
-                    <td>04</td>
-                    <td>04</td>
-                    <td>04</td>
-                    <td>04</td>
-                    <td>04</td>
-                    <td>04</td>
-                    <td>04</td>
-                    <td>28</td>
-                </tr>
-                <tr>
-                    <td>Avancado</td>
-                    <td>Brenna Jensen</td>
-                    <td>04</td>
-                    <td>03</td>
-                    <td>02</td>
-                    <td>03</td>
-                    <td>01</td>
-                    <td>02</td>
-                    <td>00</td>
-                    <td>15</td>
-                </tr>
-                <tr>
-                    <td>Iniciante</td>
-                    <td>Allie Hayes</td>
-                    <td>00</td>
-                    <td>01</td>
-                    <td>00</td>
-                    <td>01</td>
-                    <td>00</td>
-                    <td>00</td>
-                    <td>00</td>
-                    <td>02</td>
-                </tr>
-                <tr>
-                    <td>Avancado</td>
-                    <td>Connor Edwards</td>
-                    <td>03</td>
-                    <td>04</td>
-                    <td>03</td>
-                    <td>04</td>
-                    <td>03</td>
-                    <td>00</td>
-                    <td>00</td>
-                    <td>17</td>
-                </tr>
-                <tr>
-                    <td>Extremamente avancado</td>
-                    <td>Demi Davis</td>
-                    <td>03</td>
-                    <td>03</td>
-                    <td>03</td>
-                    <td>03</td>
-                    <td>03</td>
-                    <td>05</td>
-                    <td>05</td>
-                    <td>25</td>
-                </tr>
-                <tr>
-                    <td>Intermediario</td>
-                    <td>Hannah Wells</td>
-                    <td>00</td>
-                    <td>01</td>
-                    <td>00</td>
-                    <td>01</td>
-                    <td>00</td>
-                    <td>04</td>
-                    <td>04</td>
-                    <td>10</td>
-                </tr>
-                <tr>
-                    <td>Iniciante</td>
-                    <td>Greace Ivers</td>
-                    <td>00</td>
-                    <td>01</td>
-                    <td>00</td>
-                    <td>01</td>
-                    <td>00</td>
-                    <td>01</td>
-                    <td>00</td>
-                    <td>03</td>
-                </tr>
-                <tr>
-                    <td>Avancado</td>
-                    <td>Garret Graham</td>
-                    <td>03</td>
-                    <td>03</td>
-                    <td>03</td>
-                    <td>02</td>
-                    <td>02</td>
-                    <td>01</td>
-                    <td>01</td>
-                    <td>15</td>
-                </tr>
-                <tr>
-                    <td>Intermediario</td>
-                    <td>Hunter Davenport</td>
-                    <td>02</td>
-                    <td>02</td>
-                    <td>02</td>
-                    <td>02</td>
-                    <td>02</td>
-                    <td>00</td>
-                    <td>00</td>
-                    <td>10</td>
-                </tr>
-                <tr>
-                    <td>Extremamente avancado</td>
-                    <td>Jake Connely</td>
-                    <td>04</td>
-                    <td>04</td>
-                    <td>04</td>
-                    <td>04</td>
-                    <td>04</td>
-                    <td>02</td>
-                    <td>01</td>
-                    <td>23</td>
-                </tr>
-                <tr>
-                    <td>Avancado</td>
-                    <td>John Logan</td>
-                    <td>03</td>
-                    <td>03</td>
-                    <td>03</td>
-                    <td>03</td>
-                    <td>03</td>
-                    <td>03</td>
-                    <td>01</td>
-                    <td>19</td>
-                </tr>
-				<tr>
-                    <td>Iniciante</td>
-                    <td>John Tucker</td>
-                    <td>01</td>
-                    <td>01</td>
-                    <td>00</td>
-                    <td>01</td>
-                    <td>02</td>
-                    <td>00</td>
-                    <td>00</td>
-                    <td>05</td>
-                </tr>
-                <tr>
-                    <td>Intermediario</td>
-                    <td>Taylor Marsh</td>
-                    <td>01</td>
-                    <td>01</td>
-                    <td>01</td>
-                    <td>01</td>
-                    <td>02</td>
-                    <td>01</td>
-                    <td>01</td>
-                    <td>08</td>
-                </tr>
-                <tr>
-                    <td>Iniciante</td>
-                    <td>Sabrina James</td>
-                    <td>01</td>
-                    <td>01</td>
-                    <td>00</td>
-                    <td>01</td>
-                    <td>02</td>
-                    <td>00</td>
-                    <td>00</td>
-                    <td>05</td>
-                </tr>
-            </tbody>
+            <tbody id="rankingTableBody">
+                <!-- Os dados serão preenchidos dinamicamente -->
+            </tbody>   
         </table>
     </div>
 </div>
-<script src="./js/ranking_semanal.js"></script>
+<script src="./js/ranking_semanal.js" defer></script>
 </body>
 </html>
