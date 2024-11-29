@@ -1,29 +1,62 @@
-// Função para contar o número de linhas na tabela e atualizar o campo de quantidade de alunos
-function atualizarQuantidadeAlunos() {
-    var tabela = document.getElementById("tabela-alunos");
-    var quantidadeAlunos = tabela.getElementsByTagName("tr").length - 1; // Subtrai 1 para não contar o cabeçalho
-    document.getElementById("retangulo-quantidade").textContent = "Quantidade de alunos: " + quantidadeAlunos;
-}
+document.addEventListener('DOMContentLoaded', () => {
+    const tabelaAlunos = document.querySelector('#tabela-alunos tbody');
+    const quantidadeAlunos = document.getElementById('retangulo-quantidade');
 
-// Função para ordenar as linhas da tabela por ordem alfabética com base no nome completo
-function ordenarTabelaPorNome() {
-    const tabela = document.getElementById("tabela-alunos");
-    const linhas = Array.from(tabela.querySelectorAll("tbody tr"));
+    // Função para buscar dados do ranking geral
+    async function carregarRankingGeral() {
+        try {
+            const response = await fetch('http://localhost:3000/ranking-geral');
+            if (!response.ok) {
+                throw new Error('Erro ao buscar ranking geral');
+            }
 
-    // Ordena as linhas alfabeticamente com base no primeiro <td> (Nome Completo)
-    linhas.sort((a, b) => {
-        const nomeA = a.querySelector("td").textContent.trim().toLowerCase();
-        const nomeB = b.querySelector("td").textContent.trim().toLowerCase();
-        return nomeA.localeCompare(nomeB);
-    });
+            const data = await response.json();
 
-    // Remove as linhas existentes do tbody e reinsere na ordem correta
-    const tbody = tabela.querySelector("tbody");
-    linhas.forEach(linha => tbody.appendChild(linha));
-}
+            // Limpa a tabela antes de adicionar novos dados
+            tabelaAlunos.innerHTML = '';
 
-// Chama a função ao carregar a página
-window.onload = function () {
-    ordenarTabelaPorNome();
-    atualizarQuantidadeAlunos();
-};
+            // Adiciona os dados na tabela
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row[0]}</td>
+                    <td>${row[1]}</td>
+                    <td>${row[2]}</td>
+                `;
+                tabelaAlunos.appendChild(tr);
+            });
+
+            // Atualiza a quantidade de alunos
+            atualizarQuantidadeAlunos();
+
+            // Ordena a tabela por nome
+            ordenarTabelaPorNome();
+        } catch (error) {
+            console.error('Erro:', error);
+            alert('Não foi possível carregar o ranking geral dos alunos.');
+        }
+    }
+
+    // Função para contar o número de linhas na tabela e atualizar o campo de quantidade de alunos
+    function atualizarQuantidadeAlunos() {
+        const quantidadeAlunos = tabelaAlunos.getElementsByTagName("tr").length;
+        document.getElementById("retangulo-quantidade").textContent = "Quantidade de alunos: " + quantidadeAlunos;
+    }
+
+    // Função para ordenar as linhas da tabela por ordem alfabética com base no nome completo
+    function ordenarTabelaPorNome() {
+        const linhas = Array.from(tabelaAlunos.querySelectorAll("tr"));
+
+        linhas.sort((a, b) => {
+            const nomeA = a.querySelector("td").textContent.trim().toLowerCase();
+            const nomeB = b.querySelector("td").textContent.trim().toLowerCase();
+            return nomeA.localeCompare(nomeB);
+        });
+
+        // Remove as linhas existentes do tbody e reinsere na ordem correta
+        linhas.forEach(linha => tabelaAlunos.appendChild(linha));
+    }
+
+    // Chama a função para carregar os dados ao carregar a página
+    carregarRankingGeral();
+});
