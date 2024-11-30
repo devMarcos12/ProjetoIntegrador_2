@@ -8,99 +8,145 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100vh;
-    background-color: rgb(239, 56, 56);;
-    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    background-color: rgb(239, 56, 56); /* Fundo vermelho original */
+    font-family: 'Poppins', Arial, sans-serif;
+    color: #333;
 }
 
 .interface {
     background-color: #fff;
-    padding: 100px;
-    width: 600px;
+    padding: 40px 60px;
+    width: 100%;
+    max-width: 700px; /* Limita a largura para dispositivos grandes */
     text-align: center;
-    border-radius: 10px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    border-radius: 12px; /* Bordas mais arredondadas */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Sombra suave para dar profundidade */
+    transition: all 0.3s ease;
 }
 
 h2 {
-    font-size: 40px;
-    
+    font-size: 38px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 20px;
 }
 
-/* Relógio digital */
 .relogio {
-    font-size: 48px; 
+    font-size: 60px;
     font-weight: bold;
-    color: rgb(239, 56, 56);; 
-    font-family: 'Courier New', Courier, monospace; 
-    padding: 10px 20px; 
-    border-radius: 5px; 
-    display: inline-block; 
+    color: #f44336; /* Cor vibrante para chamar atenção */
+    font-family: 'Courier New', Courier, monospace;
+    padding: 12px 25px;
+    background-color: #fff; /* Fundo branco com bordas arredondadas */
+    border-radius: 8px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    margin: 20px 0;
+    letter-spacing: 2px; /* Espaçamento entre letras */
 }
 
 .data {
     font-size: 24px;
-    font-weight: bold;
-    color: rgb(239, 56, 56);;
-    font-family: 'Courier New', Courier, monospace; 
-    padding: 8px 16px;
-    border-radius: 5px;
-    margin-bottom: 10px;
+    font-weight: 500;
+    color: #666;
+    font-family: 'Poppins', Arial, sans-serif;
+    padding: 10px 20px;
+    border-radius: 6px;
+    background-color: #fff;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
 }
 
-/* botoes */
+/* Estilos para os botões */
 .botoes button {
-    width: 100px;
-    padding: 10px;
+    width: 120px;
+    padding: 14px 20px;
     margin: 10px;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 16px;
+    font-weight: 600;
     color: #fff;
-    transition: background-color 0.3s;
-    button:active {
-        background-color: #808080; /* Cinza */
-    }
+    background-color: #007bff; /* Azul padrão */
+    transition: all 0.3s ease;
 }
 
+/* Efeito de hover nos botões */
+.botoes button:hover {
+    background-color: #0056b3; 
+    transform: translateY(-4px); 
+}
+
+/* Efeito de clique nos botões */
+.botoes button:active {
+    background-color: #004085; 
+    transform: translateY(2px); 
+}
+
+/* Botões com cores específicas */
 #entrada {
-    background-color: #28a745;
+    background-color: #28a745; 
 }
 
 #saida {
-    background-color: #dc3545;
+    background-color: #dc3545; 
 }
 
-.botoes button.active {
-    background-color: #ffc107;
+/* Alteração de cor quando o botão é clikado */
+.botoes button.active-entrada {
+    background-color: #34b23f; 
+    box-shadow: 0 0 20px rgba(0, 123, 255, 0.7); 
+    transform: scale(1.1); 
 }
 
-/* label do CPF */
+.botoes button.active-saida {
+    background-color: #f44336; 
+    box-shadow: 0 0 20px rgba(255, 87, 34, 0.7); 
+    transform: scale(1.1); 
+}
+
+
 .cpf-form {
     display: none;
     margin-top: 20px;
 }
 
 .cpf-form input {
-    padding: 10px;
-    width: 180px;
+    padding: 12px;
+    width: 100%;
+    max-width: 250px; 
     border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-bottom: 10px;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+    margin-bottom: 20px;
 }
 
-/* Botões de Enviar */
+.cpf-form input:focus {
+    border-color: #007bff; 
+    outline: none;
+}
+
+/* Botões de enviar com maior destaque */
 #enviar-entrada, #enviar-saida {
     width: 100%;
-    padding: 10px;
+    padding: 15px;
     color: #fff;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
-    margin-top: 5px;
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 15px;
     background-color: #007bff;
+    transition: background-color 0.3s ease;
 }
 
+#enviar-entrada:hover, #enviar-saida:hover {
+    background-color: #0056b3;
+}
 
-
+#enviar-entrada:active, #enviar-saida:active {
+    background-color: #004085;
+}

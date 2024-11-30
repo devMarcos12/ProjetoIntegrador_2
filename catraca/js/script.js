@@ -7,6 +7,21 @@ function CPFmodel(cpf) {
     return cpf;
 }
 
+// Seleciona os botões de entrada e saída
+const entradaButton = document.getElementById('entrada');
+const saidaButton = document.getElementById('saida');
+
+// Função para adicionar ou remover a classe 'active' nos botões
+entradaButton.addEventListener('click', () => {
+    entradaButton.classList.add('active-entrada');
+    saidaButton.classList.remove('active-saida');
+});
+
+saidaButton.addEventListener('click', () => {
+    saidaButton.classList.add('active-saida');
+    entradaButton.classList.remove('active-entrada');
+});
+
 // Formata o CPF em tempo real
 document.getElementById('cpf').addEventListener('input', (event) => {
     event.target.value = CPFmodel(event.target.value);
