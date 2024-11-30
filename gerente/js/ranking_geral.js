@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
             atualizarQuantidadeAlunos();
 
             // Ordena a tabela por nome
-            ordenarTabelaPorNome();
+            ordenarTabelaPorHoras();
         } catch (error) {
             console.error('Erro:', error);
             alert('Não foi possível carregar o ranking geral dos alunos.');
@@ -44,13 +44,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Função para ordenar as linhas da tabela por ordem alfabética com base no nome completo
-    function ordenarTabelaPorNome() {
+    // Função para ordenar as linhas da tabela por quantidade de horas treinadas
+    function ordenarTabelaPorHoras() {
         const linhas = Array.from(tabelaAlunos.querySelectorAll("tr"));
 
         linhas.sort((a, b) => {
-            const nomeA = a.querySelector("td").textContent.trim().toLowerCase();
-            const nomeB = b.querySelector("td").textContent.trim().toLowerCase();
-            return nomeA.localeCompare(nomeB);
+            const horasA = parseFloat(a.querySelectorAll("td")[2].textContent.trim());
+            const horasB = parseFloat(b.querySelectorAll("td")[2].textContent.trim());
+            return horasB - horasA;
         });
 
         // Remove as linhas existentes do tbody e reinsere na ordem correta
