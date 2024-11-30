@@ -32,6 +32,21 @@ function atualizarData() {
 setInterval(atualizarRelogio, 1000);
 setInterval(atualizarData, 1000);
 
+// Seleciona os botões de entrada e saída
+const entradaButton = document.getElementById('entrada');
+const saidaButton = document.getElementById('saida');
+
+// Função para adicionar ou remover a classe 'active' nos botões
+entradaButton.addEventListener('click', () => {
+    entradaButton.classList.add('active-entrada');
+    saidaButton.classList.remove('active-saida');
+});
+
+saidaButton.addEventListener('click', () => {
+    saidaButton.classList.add('active-saida');
+    entradaButton.classList.remove('active-entrada');
+});
+
 // Função para mostrar o formulário e ajustar os botões
 function mostrarFormulario(botao) {
     btnEntrada.classList.remove('active');

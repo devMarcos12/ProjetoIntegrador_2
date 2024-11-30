@@ -1,103 +1,139 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Inter', sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
     margin: 0;
     background-color: rgb(239, 56, 56);
+    color: #333;
 }
+
 .container {
-    width: 90%;
-    max-width: 1000px;
+    width: 80%;
+    max-width: 1200px;
     background-color: white;
-    padding: 30px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
+    padding: 20px 30px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    overflow: hidden;
 }
+
 h1 {
     text-align: center;
-    font-size: 2.5em;
-    margin-bottom: 30px;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    color: rgb(239, 56, 56);
 }
+
+h1::after {
+    content: '';
+    display: block;
+    width: 4rem;
+    height: 3px;
+    background-color: rgb(239, 56, 56);
+    border-radius: 3px;
+    margin: 0.5rem auto 0;
+}
+
 .search-container {
     display: flex;
     justify-content: flex-end;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     gap: 10px;
     align-items: center;
 }
+
 .quantidade-alunos {
     display: flex;
     align-items: center;
     gap: 5px;
-    font-size: 1em;
+    font-size: 1rem;
     color: white;
 }
+
 .retangulo-cinza {
     background-color: #888;
     padding: 10px;
     color: white;
-    border-radius: 4px;
+    border-radius: 5px;
     min-width: 150px;
     text-align: center;
-    font-weight: normal;
+    font-weight: 500;
 }
+
 .search-container input[type="text"] {
     width: 180px;
     padding: 10px;
     border: none;
-    color: white;
-    font-size: 1em;
-    border-radius: 4px;
-}
-.search-container input[type="text"]::placeholder {
-    color: white;
-}
-.search-container input[type="text"].pesquisar {
     background-color: rgb(239, 56, 56);
-    font-weight: normal;
+    color: white;
+    font-size: 1rem;
+    border-radius: 5px;
+    font-weight: 500;
 }
 
-/* Estilos para o contêiner da tabela com rolagem */
-.table-container {
-    max-height: 300px; /* Altura máxima da tabela com rolagem */
-    overflow-y: auto; /* Adiciona a barra de rolagem vertical */
+.search-container input[type="text"]::placeholder {
+    color: #f0f0f0;
 }
+
+.table-container {
+    max-height: 50vh; /* Define uma altura máxima para a área da tabela */
+    overflow-y: auto; /* Habilita a rolagem vertical */
+    border-radius: 8px; /* Bordas arredondadas */
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1); /* Sombra suave ao redor */
+    border: 1px solid #ddd; /* Borda suave ao redor da tabela */
+}
+
 table {
     width: 100%;
-    border-collapse: collapse;
-    font-size: 1.2em;
+    border-collapse: collapse; /* Remove espaços entre as células */
+    font-size: 1rem;
 }
+
 th, td {
     padding: 15px;
     text-align: left;
-    background-color: #666;
+    background-color: #666; /* Fundo escuro nas células */
     color: white;
-}
-th {
-    background-color: #333;
-    font-weight: normal;
-    position: sticky;
-    top: 0; /* Cabeçalho fixo na tabela ao rolar */
-    z-index: 1;
-}
-tr {
-    border-bottom: 6px solid #333;
+    border-bottom: 4px solid #333; /* Borda mais espessa no fundo das células */
 }
 
-/* Estilos para a barra de rolagem */
+th {
+    background-color: #333;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    font-size: 1rem;
+}
+
+td {
+    background-color: #f8f8f8; /* Fundo mais claro nas células */
+    color: #333;
+    border: 1px solid #ddd; /* Borda suave entre as células */
+}
+
+table tr:nth-child(even) td {
+    background-color: #e6e6e6; /* Alternância de cor nas linhas */
+}
+
 .table-container::-webkit-scrollbar {
-    width: 12px;
+    width: 14px; /* Largura maior da barra de rolagem */
 }
+
 .table-container::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: #f1f1f1; /* Cor do fundo da barra de rolagem */
+    border-radius: 8px;
 }
+
 .table-container::-webkit-scrollbar-thumb {
-    background-color: #888;
+    background-color: rgb(239, 56, 56); /* Cor da barra de rolagem */
     border-radius: 10px;
-    border: 3px solid #f1f1f1;
+    border: 3px solid #f1f1f1; /* Espaço entre a barra e o track */
 }
+
 .table-container::-webkit-scrollbar-thumb:hover {
-    background: #555;
+    background: rgb(211, 40, 40); /* Cor ao passar o mouse */
 }
