@@ -43,7 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById("retangulo-quantidade").textContent = "Quantidade de alunos: " + quantidadeAlunos;
     }
 
-    // Função para ordenar as linhas da tabela por ordem alfabética com base no nome completo
     // Função para ordenar as linhas da tabela por quantidade de horas treinadas
     function ordenarTabelaPorHoras() {
         const linhas = Array.from(tabelaAlunos.querySelectorAll("tr"));

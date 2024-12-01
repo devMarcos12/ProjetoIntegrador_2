@@ -29,18 +29,36 @@ function obterDiaSemana(dataStr) {
 
 // Função para verificar se a data está na semana atual (de domingo a sábado)
 function isDataNaSemanaAtual(dataStr) {
-    const data = new Date(dataStr);
+    console.log("Data recebida (dataStr):", dataStr);
+
+    // Força a criação correta da data no formato YYYY-MM-DD
+    const [ano, mes, dia] = dataStr.split("-").map(Number);
+    const data = new Date(ano, mes - 1, dia); // Cria a data sem interferência de timezone
+    data.setHours(0, 0, 0, 0);
+    console.log("Data formatada (após zerar horas):", data);
+
+    // Define a data de hoje e zera as horas
     const hoje = new Date();
-    
-    // Calcula o início e o fim da semana (domingo a sábado)
+    hoje.setHours(0, 0, 0, 0);
+    console.log("Data de hoje (zerada):", hoje);
+
+    // Calcula o início da semana (domingo)
     const inicioSemana = new Date(hoje);
     inicioSemana.setDate(hoje.getDate() - hoje.getDay());
+    inicioSemana.setHours(0, 0, 0, 0);
+    console.log("Início da semana:", inicioSemana);
 
+    // Calcula o fim da semana (sábado)
     const fimSemana = new Date(inicioSemana);
     fimSemana.setDate(inicioSemana.getDate() + 6);
+    fimSemana.setHours(23, 59, 59, 999);
+    console.log("Fim da semana:", fimSemana);
 
-    // Verifica se a data está dentro do intervalo da semana atual
-    return data >= inicioSemana && data <= fimSemana;
+    // Verifica se a data está dentro do intervalo
+    const resultado = data >= inicioSemana && data <= fimSemana;
+    console.log(`Data ${data} está na semana atual?`, resultado);
+
+    return resultado;
 }
 
 // Array dos nomes dos dias da semana para facilitar a marcação no HTML
