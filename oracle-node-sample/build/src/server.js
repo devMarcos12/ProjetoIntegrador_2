@@ -27,6 +27,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importStar(require("express"));
+const oracledb_1 = __importDefault(require("oracledb"));
 const cors_1 = __importDefault(require("cors"));
 const connection_1 = __importDefault(require("./connection"));
 const app = (0, express_1.default)();
@@ -125,7 +126,6 @@ routes.post('/getStudentInfo', async (req, res) => {
               WHEN NVL(SUM(r.duracao), 0) / 60 BETWEEN 6 AND 10 THEN 'Intermediário'
               WHEN NVL(SUM(r.duracao), 0) / 60 BETWEEN 11 AND 20 THEN 'Avançado'
               WHEN NVL(SUM(r.duracao), 0) / 60 > 20 THEN 'Extremamente Avançado'
-              ELSE 'Sem classificação'
           END AS classificacao
       FROM 
           alunos a
@@ -205,7 +205,7 @@ routes.get('/last7days/:cpf', async (req, res) => {
 });
 routes.post('/registerEntry', async (req, res) => {
     const { cpf } = req.body;
-    // Setting the correctly timeZonw to ensure get the America/SaoPaulo
+    // Setting the correct timezone
     const horarioEntrada = new Date().toLocaleString('sv-SE', { timeZone: 'America/Sao_Paulo' }).replace('T', ' ');
     let connection;
     console.log(`[Entrada] Recebida requisição para registrar entrada. CPF: ${cpf}`);
@@ -213,11 +213,27 @@ routes.post('/registerEntry', async (req, res) => {
     try {
         connection = await connection_1.default.connect();
         console.log('[Entrada] Conexão com o banco de dados estabelecida.');
-        const Query = `
+        // Configura o formato de saída para objetos
+        const checkQuery = `
+      SELECT COUNT(*) AS registros_abertos
+      FROM registro_treino
+      WHERE fk_aluno_cpf = :cpf AND horario_saida IS NULL
+    `;
+        const checkResult = await connection.execute(checkQuery, { cpf }, { outFormat: oracledb_1.default.OUT_FORMAT_OBJECT } // Configura o retorno para objetos nomeados
+        );
+        // Ajuste no acesso ao resultado
+        const registrosAbertos = checkResult.rows?.[0]?.REGISTROS_ABERTOS || 0;
+        if (registrosAbertos > 0) {
+            console.warn(`[Entrada] Aluno com CPF ${cpf} já possui uma entrada sem saída registrada.`);
+            res.status(400).json({ message: 'Você ainda não registrou sua saída.' });
+            return;
+        }
+        // Insere o novo registro de entrada
+        const insertQuery = `
       INSERT INTO registro_treino (fk_aluno_cpf, horario_entrada)
       VALUES (:cpf, TO_TIMESTAMP(:horarioEntrada, 'YYYY-MM-DD HH24:MI:SS'))
     `;
-        await connection.execute(Query, {
+        await connection.execute(insertQuery, {
             cpf,
             horarioEntrada,
         });
@@ -293,6 +309,53 @@ routes.post('/registerExit', async (req, res) => {
         if (connection) {
             await connection_1.default.close(connection);
             console.log('[Saída] Conexão com o banco de dados fechada.');
+        }
+    }
+});
+routes.get('/ranking-semanal', async (_req, res) => {
+    let connection;
+    try {
+        connection = await connection_1.default.connect();
+        const query = `
+          WITH TreinosRecentes AS (
+              SELECT 
+                  r.fk_aluno_cpf,
+                  SUM(NVL(r.duracao, 0)) AS duracao_treino
+              FROM registro_treino r
+              WHERE TRUNC(r.horario_entrada) >= TRUNC(SYSDATE) - 7
+              GROUP BY r.fk_aluno_cpf
+          )
+          SELECT 
+              CASE
+                  WHEN FLOOR(NVL(t.duracao_treino, 0) / 60) <= 5 THEN 'Iniciante'
+                  WHEN FLOOR(NVL(t.duracao_treino, 0) / 60) BETWEEN 6 AND 10 THEN 'Intermediário'
+                  WHEN FLOOR(NVL(t.duracao_treino, 0) / 60) BETWEEN 11 AND 20 THEN 'Avançado'
+                  WHEN FLOOR(NVL(t.duracao_treino, 0) / 60) > 20 THEN 'Extremamente Avançado'
+              END AS CLASSIFICACAO,
+              a.cpf AS ALUNO_CPF,
+              a.name AS ALUNO_NOME,
+              FLOOR(NVL(t.duracao_treino, 0) / 60) AS TOTAL_HORAS_TREINADAS
+          FROM alunos a
+          LEFT JOIN TreinosRecentes t ON a.cpf = t.fk_aluno_cpf
+          ORDER BY CLASSIFICACAO
+      `;
+        const result = await connection.execute(query);
+        // Mapeando as linhas corretamente. `result.rows` é um array de arrays.
+        const rows = result.rows?.map((row) => ({
+            CLASSIFICACAO: row[0],
+            ALUNO_CPF: row[1],
+            ALUNO_NOME: row[2],
+            TOTAL_HORAS_TREINADAS: row[3]
+        }));
+        res.status(200).json(rows);
+    }
+    catch (err) {
+        console.error('Erro ao buscar ranking semanal:', err);
+        res.status(500).send('Erro ao processar a solicitação.');
+    }
+    finally {
+        if (connection) {
+            await connection_1.default.close(connection); // Fecha a conexão com o banco de dados
         }
     }
 });
