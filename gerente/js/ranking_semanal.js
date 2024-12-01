@@ -6,10 +6,12 @@ async function fetchRankingSemanal() {
         }
 
         const data = await response.json();
-        console.log(data)
+        console.log(data);
+
         const rankingTableBody = document.getElementById('rankingTableBody');
         rankingTableBody.innerHTML = ''; // Limpa a tabela antes de inserir novos dados
 
+        // Popula a tabela com os dados recebidos
         data.forEach(row => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -28,35 +30,31 @@ async function fetchRankingSemanal() {
     }
 }
 
-
-
 function updateStudentCount() {
     const studentCount = document.getElementById('rankingTableBody').getElementsByTagName('tr').length;
     document.getElementById('quantity').textContent = studentCount;
 }
 
-
 function sortTableByTotal() {
-    var tableBody = document.getElementById('studentTableBody');
-    var rows = Array.from(tableBody.getElementsByTagName('tr'));
+    const tableBody = document.getElementById('rankingTableBody'); // Ajuste para pegar o corpo correto
+    const rows = Array.from(tableBody.getElementsByTagName('tr'));
 
+    // Ordena as linhas com base na coluna TOTAL_HORAS_TREINADAS (índice 3)
     rows.sort(function (a, b) {
-        var totalA = parseInt(a.cells[9].textContent.trim(), 10); // Coluna TOTAL do aluno A
-        var totalB = parseInt(b.cells[9].textContent.trim(), 10); // Coluna TOTAL do aluno B
+        const totalA = parseInt(a.cells[3].textContent.trim(), 10); // Coluna TOTAL_HORAS_TREINADAS do aluno A
+        const totalB = parseInt(b.cells[3].textContent.trim(), 10); // Coluna TOTAL_HORAS_TREINADAS do aluno B
         return totalB - totalA; // Ordena em ordem decrescente (maior TOTAL primeiro)
     });
 
     // Remove todas as linhas da tabela
     tableBody.innerHTML = "";
 
-    // Reanexando as linhas ordenadas
+    // Reanexa as linhas ordenadas
     rows.forEach(function (row) {
         tableBody.appendChild(row);
     });
 }
 
 window.onload = function () {
-    updateStudentCount();
-    fetchRankingSemanal();
-    sortTableByTotal(); // Ordena a tabela pela coluna TOTAL ao carregar a página
+    fetchRankingSemanal(); // Busca os dados e preenche a tabela
 };
