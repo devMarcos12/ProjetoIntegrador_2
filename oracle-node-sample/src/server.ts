@@ -1,4 +1,5 @@
 import express, { Request, Response, Router } from 'express';
+import oracledb from 'oracledb';
 import cors from 'cors';
 import DataBase from './connection';
 
@@ -201,7 +202,7 @@ routes.get('/last7days/:cpf', async (req: Request, res: Response) => {
 routes.post('/registerEntry', async (req: Request, res: Response) => {
   const { cpf } = req.body;
 
-  // Setting the correctly timeZonw to ensure get the America/SaoPaulo
+  // Setting the correct timezone
   const horarioEntrada = new Date().toLocaleString('sv-SE', { timeZone: 'America/Sao_Paulo' }).replace('T', ' ');
 
   let connection;
@@ -213,11 +214,33 @@ routes.post('/registerEntry', async (req: Request, res: Response) => {
     connection = await DataBase.connect();
     console.log('[Entrada] Conexão com o banco de dados estabelecida.');
 
-    const Query = `
+    // Configura o formato de saída para objetos
+    const checkQuery = `
+      SELECT COUNT(*) AS registros_abertos
+      FROM registro_treino
+      WHERE fk_aluno_cpf = :cpf AND horario_saida IS NULL
+    `;
+    const checkResult = await connection.execute<{ REGISTROS_ABERTOS: number }>(
+      checkQuery,
+      { cpf },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT } // Configura o retorno para objetos nomeados
+    );
+
+    // Ajuste no acesso ao resultado
+    const registrosAbertos = checkResult.rows?.[0]?.REGISTROS_ABERTOS || 0;
+
+    if (registrosAbertos > 0) {
+      console.warn(`[Entrada] Aluno com CPF ${cpf} já possui uma entrada sem saída registrada.`);
+      res.status(400).json({ message: 'Você ainda não registrou sua saída.' });
+      return;
+    }
+
+    // Insere o novo registro de entrada
+    const insertQuery = `
       INSERT INTO registro_treino (fk_aluno_cpf, horario_entrada)
       VALUES (:cpf, TO_TIMESTAMP(:horarioEntrada, 'YYYY-MM-DD HH24:MI:SS'))
     `;
-    await connection.execute(Query, {
+    await connection.execute(insertQuery, {
       cpf,
       horarioEntrada,
     });
