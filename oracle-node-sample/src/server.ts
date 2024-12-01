@@ -114,7 +114,6 @@ routes.post('/getStudentInfo', async (req: Request, res: Response) => {
               WHEN NVL(SUM(r.duracao), 0) / 60 BETWEEN 6 AND 10 THEN 'Intermediário'
               WHEN NVL(SUM(r.duracao), 0) / 60 BETWEEN 11 AND 20 THEN 'Avançado'
               WHEN NVL(SUM(r.duracao), 0) / 60 > 20 THEN 'Extremamente Avançado'
-              ELSE 'Sem classificação'
           END AS classificacao
       FROM 
           alunos a
@@ -317,7 +316,7 @@ routes.get('/ranking-semanal', async (_req: Request, res: Response) => {
                   r.fk_aluno_cpf,
                   SUM(NVL(r.duracao, 0)) AS duracao_treino
               FROM registro_treino r
-              WHERE TRUNC(r.horario_entrada) BETWEEN TRUNC(SYSDATE) - 6 AND TRUNC(SYSDATE)
+              WHERE TRUNC(r.horario_entrada) >= TRUNC(SYSDATE) - 7
               GROUP BY r.fk_aluno_cpf
           )
           SELECT 
@@ -326,7 +325,6 @@ routes.get('/ranking-semanal', async (_req: Request, res: Response) => {
                   WHEN FLOOR(NVL(t.duracao_treino, 0) / 60) BETWEEN 6 AND 10 THEN 'Intermediário'
                   WHEN FLOOR(NVL(t.duracao_treino, 0) / 60) BETWEEN 11 AND 20 THEN 'Avançado'
                   WHEN FLOOR(NVL(t.duracao_treino, 0) / 60) > 20 THEN 'Extremamente Avançado'
-                  ELSE 'Sem classificação'
               END AS CLASSIFICACAO,
               a.cpf AS ALUNO_CPF,
               a.name AS ALUNO_NOME,
@@ -335,6 +333,7 @@ routes.get('/ranking-semanal', async (_req: Request, res: Response) => {
           LEFT JOIN TreinosRecentes t ON a.cpf = t.fk_aluno_cpf
           ORDER BY CLASSIFICACAO
       `;
+  
 
       const result = await connection.execute(query);
 
